@@ -2,944 +2,223 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>tayooo</title>
-<meta name="description" content="個人開発・写真・ブログをまとめた場所。tayoooの個人サイト。">
-<meta property="og:title" content="tayooo">
-<meta property="og:description" content="個人開発・写真・ブログをまとめた場所。">
-<meta property="og:url" content="https://tayooo.com">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tayooo.</title>
+<meta name="description" content="境界線のこちら側ではエンジニア、向こう側ではただの好奇心。ゲームとツールとブログの置き場。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23e18c6d'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ─── Variables ─── */
-:root {
-  --bg:     #F5F5F5;
-  --text:   #201d1e;
-  --sub:    #3c5159;
-  --accent: #f5811c;
-  --border: rgba(60,81,89,0.2);
-  --fh:     'Bebas Neue', sans-serif;
-  --fb:     'Noto Sans JP', sans-serif;
-}
-
-/* ─── Reset ─── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--fb);
-  line-height:1.6;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-img{display:block;max-width:100%}
-a{text-decoration:none;color:inherit}
-
-/* ─── Loading ─── */
-#loader{
-  position:fixed;inset:0;
-  z-index:9999;
-  background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  transition:opacity 0.7s ease;
-}
-#loader.hide{opacity:0;pointer-events:none}
-
-.loader-logo{
-  font-family:var(--fh);
-  font-size:clamp(3rem,8vw,5rem);
-  letter-spacing:0.1em;
-  color:var(--text);
-  margin-bottom:2rem;
-}
-.loader-logo span{color:var(--accent)}
-
-.loader-bar-wrap{
-  width:min(260px,60vw);
-  height:2px;
-  background:var(--border);
-  border-radius:2px;
-  overflow:hidden;
-  margin-bottom:0.75rem;
-}
-.loader-bar{
-  height:100%;
-  width:0%;
-  background:var(--accent);
-  border-radius:2px;
-  transition:width 0.1s linear;
-}
-.loader-count{
-  font-family:var(--fh);
-  font-size:0.9rem;
-  letter-spacing:0.15em;
-  color:var(--sub);
-}
-
-/* ─── Nav ─── */
-nav{
-  position:fixed;top:0;left:0;right:0;
-  z-index:500;
-  height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 2.5rem;
-  background:rgba(237,241,236,0.78);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
-}
-
-.nav-logo{
-  font-family:var(--fh);
-  font-size:1.6rem;
-  letter-spacing:0.08em;
-  color:var(--text);
-}
-.nav-logo span{color:var(--accent)}
-
-.nav-links{
-  display:flex;
-  gap:2rem;
-  list-style:none;
-}
-.nav-links a{
-  font-family:var(--fh);
-  font-size:0.95rem;
-  letter-spacing:0.08em;
-  color:var(--sub);
-  transition:color 0.2s;
-}
-.nav-links a:hover{color:var(--accent)}
-
-.burger{
-  display:none;
-  flex-direction:column;
-  gap:5px;
-  background:none;
-  border:none;
-  cursor:pointer;
-  padding:4px;
-}
-.burger span{
-  display:block;width:22px;height:2px;
-  background:var(--text);border-radius:2px;
-  transition:transform 0.3s,opacity 0.3s;
-}
-.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.burger.open span:nth-child(2){opacity:0}
-.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-
-/* ─── Layout helpers ─── */
-.wrap{max-width:1100px;margin:0 auto;padding:0 2.5rem}
-
-.sec{
-  position:relative;
-  padding:7rem 0;
-}
-
-/* Vertical label (left side of section) */
-.v-label{
-  position:absolute;
-  left:0;
-  top:50%;
-  transform:translateY(-50%) rotate(180deg);
-  writing-mode:vertical-rl;
-  font-family:var(--fh);
-  font-size:0.78rem;
-  letter-spacing:0.25em;
-  color:var(--sub);
-  opacity:0.35;
-  text-transform:uppercase;
-  user-select:none;
-}
-
-/* Section header */
-.sec-title{
-  font-family:var(--fh);
-  font-size:clamp(2.5rem,6vw,4rem);
-  letter-spacing:0.04em;
-  line-height:1;
-  color:var(--text);
-}
-.sec-sub{
-  font-family:var(--fh);
-  font-size:0.9rem;
-  letter-spacing:0.12em;
-  color:var(--sub);
-  text-transform:uppercase;
-  margin-top:0.25rem;
-}
-.sec-head{margin-bottom:3rem}
-
-hr.div{border:none;border-top:1px solid var(--border)}
-
-/* View-all link */
-.see-all{
-  display:inline-flex;
-  align-items:center;
-  gap:0.4rem;
-  font-family:var(--fh);
-  font-size:1rem;
-  letter-spacing:0.08em;
-  color:var(--accent);
-  transition:gap 0.2s;
-  margin-top:2rem;
-}
-.see-all:hover{gap:0.65rem}
-
-/* ─── Hero ─── */
-#hero{
-  min-height:100svh;
-  display:flex;
-  align-items:center;
-  padding-top:60px;
-  overflow:hidden;
-}
-
-.hero-inner{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:3rem;
-  width:100%;
-  padding:4rem 2.5rem;
-  max-width:1100px;
-  margin:0 auto;
-}
-
-.hero-left{flex:1}
-
-.hero-eyebrow{
-  font-family:var(--fh);
-  font-size:0.8rem;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:var(--accent);
-  margin-bottom:0.75rem;
-}
-
-.hero-title{
-  font-family:var(--fh);
-  font-size:clamp(5rem,15vw,11rem);
-  letter-spacing:0.04em;
-  line-height:0.88;
-  color:var(--text);
-  margin-bottom:0.4rem;
-}
-
-.hero-en{
-  font-family:var(--fh);
-  font-size:clamp(1.1rem,3vw,2rem);
-  letter-spacing:0.12em;
-  color:var(--sub);
-  margin-bottom:1rem;
-}
-
-.hero-ja{
-  font-size:0.9rem;
-  color:var(--sub);
-  line-height:1.8;
-  margin-bottom:2.5rem;
-  max-width:360px;
-}
-
-.hero-sns{display:flex;gap:0.75rem;flex-wrap:wrap}
-
-.sns-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:0.45rem;
-  font-family:var(--fh);
-  font-size:0.9rem;
-  letter-spacing:0.06em;
-  color:var(--sub);
-  padding:0.5rem 1.1rem;
-  border:1px solid var(--border);
-  border-radius:100px;
-  transition:color 0.2s,border-color 0.2s;
-}
-.sns-btn:hover{color:var(--accent);border-color:var(--accent)}
-.sns-btn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
-
-/* Hero avatar */
-.hero-right{flex-shrink:0}
-
-.avatar-wrap{
-  width:200px;height:200px;
-  border-radius:50%;
-  overflow:hidden;
-  border:3px solid var(--border);
-  background:var(--sub);
-  position:relative;
-  opacity:0;
-  transform:translateY(-20px);
-  animation:avatarIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;
-}
-@keyframes avatarIn{to{opacity:1;transform:translateY(0)}}
-
-.avatar-wrap img{width:100%;height:100%;object-fit:cover}
-
-.avatar-ph{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,var(--sub),#1e2e34);
-}
-.avatar-ph svg{width:72px;height:72px;fill:rgba(255,255,255,0.2)}
-
-/* ─── Gallery ─── */
-.gallery-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1rem;
-  margin-bottom:0.5rem;
-}
-
-.g-item{
-  aspect-ratio:4/3;
-  overflow:hidden;
-  border-radius:8px;
-  background:var(--sub);
-  position:relative;
-}
-.g-item img{
-  width:100%;height:100%;
-  object-fit:cover;
-  transition:transform 0.4s ease,box-shadow 0.4s ease;
-}
-.g-item:hover img{transform:scale(1.04)}
-.g-item:hover{box-shadow:0 12px 32px rgba(0,0,0,0.12)}
-
-.g-ph{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--sub);
-  opacity:0.55;
-  font-size:2rem;
-}
-
-/* ─── Blog Slider ─── */
-.slider-outer{
-  overflow:hidden;
-  margin:0 -2.5rem;
-  cursor:grab;
-}
-.slider-outer:active{cursor:grabbing}
-
-.slider-track{
-  display:flex;
-  gap:1.5rem;
-  padding:0.5rem 2.5rem 1rem;
-  animation:slideLeft 25s linear infinite;
-  width:max-content;
-}
-.slider-outer:hover .slider-track{animation-play-state:paused}
-
-@keyframes slideLeft{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(-50%)}
-}
-
-.blog-card{
-  flex:0 0 300px;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow:hidden;
-  transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;
-  display:flex;
-  flex-direction:column;
-}
-.blog-card:hover{
-  border-color:var(--accent);
-  transform:translateY(-3px);
-  box-shadow:0 10px 28px rgba(245,129,28,0.1);
-}
-
-.blog-thumb{
-  width:100%;height:170px;
-  background:var(--sub);
-  position:relative;
-  overflow:hidden;
-}
-.blog-thumb img{width:100%;height:100%;object-fit:cover}
-.blog-thumb-ph{
-  position:absolute;inset:0;
-  background:var(--sub);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0.5;
-  font-size:1.75rem;
-}
-
-.blog-body{padding:1.25rem;flex:1;display:flex;flex-direction:column;gap:0.6rem}
-
-.blog-tag{
-  display:inline-block;align-self:flex-start;
-  font-family:var(--fh);
-  font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;
-  color:var(--accent);
-  background:rgba(245,129,28,0.1);
-  padding:0.2rem 0.6rem;border-radius:100px;
-}
-
-.blog-title{
-  font-size:0.9rem;font-weight:500;line-height:1.5;
-  color:var(--text);flex:1;
-}
-
-.blog-date{
-  font-family:var(--fh);
-  font-size:0.75rem;letter-spacing:0.05em;
-  color:var(--sub);
-}
-
-/* ─── Tools ─── */
-.tools-list{display:flex;flex-direction:column;gap:0}
-
-.tool-item{
-  display:flex;
-  align-items:center;
-  gap:1.5rem;
-  padding:1.5rem 0;
-  border-bottom:1px solid var(--border);
-  transition:background 0.2s;
-}
-.tool-item:first-child{border-top:1px solid var(--border)}
-
-.tool-num{
-  font-family:var(--fh);
-  font-size:1.1rem;
-  letter-spacing:0.08em;
-  color:var(--accent);
-  min-width:2.5rem;
-  flex-shrink:0;
-}
-
-.tool-info{flex:1}
-
-.tool-name{
-  font-family:var(--fh);
-  font-size:1.4rem;
-  letter-spacing:0.04em;
-  color:var(--text);
-}
-
-.tool-desc{
-  font-size:0.8rem;
-  color:var(--sub);
-  margin-top:0.15rem;
-}
-
-.tool-url{
-  font-family:var(--fh);
-  font-size:0.8rem;
-  letter-spacing:0.06em;
-  color:var(--accent);
-  flex-shrink:0;
-  opacity:0;
-  transform:translateX(-6px);
-  transition:opacity 0.2s,transform 0.2s;
-}
-.tool-item:hover .tool-url{opacity:1;transform:translateX(0)}
-
-.tool-empty .tool-name{
-  color:var(--border);
-  font-size:1rem;
-}
-
-/* ─── Profile ─── */
-.profile-inner{
-  display:flex;
-  align-items:flex-start;
-  gap:3rem;
-  position:relative;
-}
-
-.profile-img{
-  flex-shrink:0;
-  width:110px;height:110px;
-  border-radius:50%;
-  overflow:hidden;
-  border:2px solid var(--border);
-  background:var(--sub);
-  position:relative;
-}
-.profile-img img{width:100%;height:100%;object-fit:cover}
-
-.profile-body{flex:1}
-
-.profile-name{
-  font-family:var(--fh);
-  font-size:2rem;
-  letter-spacing:0.04em;
-  margin-bottom:0.15rem;
-}
-.profile-handle{
-  font-family:var(--fh);
-  font-size:0.85rem;
-  letter-spacing:0.06em;
-  color:var(--sub);
-  margin-bottom:1rem;
-}
-.profile-bio{
-  font-size:0.9rem;
-  color:var(--sub);
-  line-height:1.9;
-  max-width:460px;
-}
-
-/* Stickers */
-.stickers{
-  position:absolute;right:0;top:-1rem;
-  display:flex;flex-direction:column;gap:1.5rem;
-  font-size:1.75rem;
-  opacity:0.75;
-}
-.sticker{
-  display:block;
-  animation:float 4s ease-in-out infinite;
-}
-.sticker:nth-child(2){animation-delay:1.2s}
-.sticker:nth-child(3){animation-delay:2.4s}
-
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-8px)}
-}
-
-/* ─── Footer ─── */
-footer{
-  padding:2.5rem 0;
-  border-top:1px solid var(--border);
-}
-.footer-inner{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  max-width:1100px;
-  margin:0 auto;
-  padding:0 2.5rem;
-}
-.footer-copy{
-  font-family:var(--fh);
-  font-size:0.8rem;
-  letter-spacing:0.06em;
-  color:var(--sub);
-}
-.footer-sns{display:flex;gap:1.1rem}
-.footer-sns a{color:var(--sub);transition:color 0.2s}
-.footer-sns a:hover{color:var(--accent)}
-.footer-sns svg{width:18px;height:18px;fill:currentColor;display:block}
-
-/* ─── Scroll reveal ─── */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
-.reveal.in{opacity:1;transform:none}
-.reveal-d1{transition-delay:0.1s}
-.reveal-d2{transition-delay:0.2s}
-.reveal-d3{transition-delay:0.3s}
-.reveal-d4{transition-delay:0.4s}
-.reveal-d5{transition-delay:0.5s}
-.reveal-d6{transition-delay:0.6s}
-
-/* ─── Responsive ─── */
-@media(max-width:768px){
-  .v-label{display:none}
-
-  .burger{display:flex}
-  .nav-links{
-    display:none;
-    position:fixed;top:60px;left:0;right:0;
-    background:var(--bg);
-    flex-direction:column;
-    padding:1.5rem 2rem 2rem;
-    border-bottom:1px solid var(--border);
-    gap:1.25rem;
-    box-shadow:0 8px 24px rgba(0,0,0,0.06);
+  @font-face{
+    font-family:"DT Getai Grotesk Display";
+    src:url("fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");
+    font-weight:900;
+    font-display:swap;
   }
-  .nav-links.open{display:flex}
-  .nav-links a{font-size:1.2rem}
+  :root{
+    --sky:#7e8e9e;
+    --mauve:#857a80;
+    --salmon:#e18c6d;
+    --brown:#875e5c;
+    --ink:#23233F;
+    --paper:#FAF5EE;
+    --grid:rgba(225,140,109,.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      var(--paper);
+    background-size:26px 26px;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:1060px;margin:0 auto;padding:30px 32px 34px;}
 
-  .hero-inner{flex-direction:column-reverse;align-items:center;text-align:center;padding:3rem 1.5rem}
-  .hero-ja{max-width:100%;margin:0 0 2rem}
-  .hero-sns{justify-content:center}
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg,#7e8e9e 0%,#7e8e9e 44%,#857a80 71%,#e18c6d 100%);
+    border:2.5px solid var(--ink);
+    border-radius:20px;
+    box-shadow:9px 9px 0 var(--ink);
+    padding:32px 42px 0;
+    color:#fff;
+    overflow:hidden;
+  }
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero h1{
+    font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;
+    font-size:76px;font-weight:900;line-height:1.02;margin-top:8px;letter-spacing:.005em;color:#fff;
+  }
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:10px;font-size:15.5px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 84px);margin:14px -42px 0;height:104px;}
 
-  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  /* ---------- SECTION ---------- */
+  section{margin-top:44px;position:relative;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;position:relative;}
+  .sec-head .no{font-family:Consolas,monospace;font-size:13px;font-weight:700;color:#C96F4A;}
+  .sec-head h2{font-size:28px;font-weight:900;color:var(--ink);}
+  .sec-head .d{margin-left:auto;font-size:12.5px;color:#A08FA8;font-weight:700;}
+  .ghost{position:absolute;right:6px;top:-30px;font-size:88px;font-weight:900;color:rgba(126,142,158,.28);z-index:-1;line-height:1;font-family:"DT Getai Grotesk Display",sans-serif;}
 
-  .profile-inner{flex-direction:column;align-items:center;text-align:center}
-  .profile-bio{max-width:100%}
-  .stickers{position:static;flex-direction:row;justify-content:center;margin-top:1.5rem}
+  /* ---------- TILES ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .tile{
+    border:2.5px solid var(--ink);border-radius:16px;
+    box-shadow:6px 6px 0 var(--ink);
+    padding:14px 16px 12px;
+    min-height:112px;
+    display:flex;flex-direction:column;color:#fff;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .tile:hover{transform:translate(2px,2px);box-shadow:4px 4px 0 var(--ink);}
+  .tile .head{display:flex;align-items:center;gap:10px;}
+  .tile .head svg{width:25px;height:25px;stroke-width:1.8;flex:none;}
+  .tile .head h3{font-size:18px;font-weight:900;}
+  .tile p{font-size:11.5px;line-height:1.55;font-weight:700;margin-top:7px;opacity:.92;}
+  .tile .host{margin-top:auto;padding-top:6px;font-family:Consolas,monospace;font-size:10.5px;opacity:.7;}
+  .tile.salmon{background:var(--salmon);}
+  .tile.sky{background:var(--sky);}
+  .tile.brown{background:var(--brown);}
+  .tile.mauve{background:var(--mauve);}
 
-  .footer-inner{flex-direction:column;gap:1rem;text-align:center}
+  /* ---------- LINKS + BLOG ---------- */
+  .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start;}
+  .panel{border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);background:#fff;padding:18px 20px 20px;}
+  .panel h3{font-size:17px;font-weight:900;margin-bottom:6px;color:var(--ink);}
+  .row{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #F3E7DA;padding:9px 2px;}
+  .row:last-child{border-bottom:none;}
+  .row:hover .name{color:#C96F4A;}
+  .row .name{font-size:14px;font-weight:900;}
+  .row .handle{font-family:Consolas,monospace;font-size:11.5px;color:#A79BA8;}
+  .post{display:flex;gap:14px;align-items:baseline;border-bottom:2px solid #F3E7DA;padding:9px 2px;}
+  .post:last-child{border-bottom:none;}
+  .post:hover .ttl{color:#C96F4A;}
+  .post .date{font-family:Consolas,monospace;font-size:11.5px;color:#A79BA8;white-space:nowrap;}
+  .post .ttl{font-size:13.5px;font-weight:900;line-height:1.5;}
+  .tag{font-size:10px;font-weight:900;border:1.8px solid var(--ink);border-radius:999px;padding:2px 9px;white-space:nowrap;margin-left:auto;color:#fff;}
+  .tag.a{background:var(--salmon);}
+  .tag.r{background:var(--sky);}
+  .tag.v{background:var(--brown);}
+  .more{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:900;color:#C96F4A;}
 
-  section.sec{padding:5rem 0}
-}
+  footer{margin-top:42px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width:700px){
+    .wrap{padding:16px 14px 24px;}
+    .hero{padding:22px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}
+    .hero h1{font-size:46px;}
+    .hero p{font-size:13.5px;}
+    .mountains{width:calc(100% + 40px);margin:10px -20px 0;height:64px;}
+    section{margin-top:32px;}
+    .sec-head h2{font-size:19px;}
+    .sec-head .d{display:none;}
+    .ghost{font-size:56px;top:-18px;}
+    .tiles{grid-template-columns:1fr 1fr;gap:13px;}
+    .tile{min-height:96px;padding:11px 12px;box-shadow:5px 5px 0 var(--ink);}
+    .tile .head svg{width:20px;height:20px;}
+    .tile .head h3{font-size:15px;}
+    .tile p{font-size:10px;line-height:1.45;margin-top:5px;}
+    .tile .host{display:none;}
+    .cols{grid-template-columns:1fr;gap:18px;}
+    .panel{box-shadow:5px 5px 0 var(--ink);}
+    footer{margin-top:30px;}
+  }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- ═══ Loading ═══ -->
-<div id="loader">
-  <div class="loader-logo">tay<span>ooo</span></div>
-  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
-  <div class="loader-count">loading... <span id="loader-num">0</span>%</div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="kicker">TAYOOO.COM</div>
+    <h1>tayooo<span class="dot">.</span></h1>
+    <p>境界線のこちら側ではエンジニア、向こう側ではただの好奇心。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+      <path d="M598,64 L576,96 L592,92 L584,112" stroke="#FFF3E2" stroke-width="1.6" opacity="0.7"/>
+      <path d="M442,70 L424,96 L438,92 L430,108" stroke="#FFF3E2" stroke-width="1.6" opacity="0.7"/>
+    </svg>
+  </div>
+
+  <!-- 01 VERBS -->
+  <section>
+    <div class="ghost">01</div>
+    <div class="sec-head">
+      <span class="no">01</span><h2>あそぶ・つかう・よむ・つながる</h2>
+      <span class="d">やれること別に4つのタイルへ</span>
+    </div>
+    <div class="tiles">
+      <a class="tile salmon" href="https://game.tayooo.com">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7.5 10.8v3.4M5.8 12.5h3.4"/><circle cx="15.6" cy="11.3" r=".4" fill="currentColor"/><circle cx="17.9" cy="13.8" r=".4" fill="currentColor"/></svg>
+          <h3>あそぶ</h3>
+        </div>
+        <p>Game — 時間潰し</p>
+        <div class="host">game.tayooo.com</div>
+      </a>
+      <a class="tile sky" href="https://tools.tayooo.com">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <h3>つかう</h3>
+        </div>
+        <p>Tools — 日常使いの小物ツール集</p>
+        <div class="host">tools.tayooo.com</div>
+      </a>
+      <a class="tile brown" href="/blog/">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <h3>よむ</h3>
+        </div>
+        <p>Blog — 他力本願競馬と技術メモ</p>
+        <div class="host">tayooo.com/blog</div>
+      </a>
+      <a class="tile mauve" href="#links">
+        <div class="head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <h3>つながる</h3>
+        </div>
+        <p>SNS — X / Instagram / GitHub</p>
+        <div class="host">links</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 02 LINKS & BLOG -->
+  <section id="links">
+    <div class="ghost">02</div>
+    <div class="sec-head">
+      <span class="no">02</span><h2>リンクとブログ</h2>
+      <span class="d">SNSリンクと、ブログの最新記事</span>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h3>Links</h3>
+        <a class="row" href="https://x.com/tayooooo98"><span class="name">𝕏 X</span><span class="handle">@tayooooo98</span></a>
+        <a class="row" href="https://instagram.com/tayooooo.98"><span class="name">◎ Instagram</span><span class="handle">@tayooooo.98</span></a>
+        <a class="row" href="https://github.com/tayooo23"><span class="name">&lt;/&gt; GitHub</span><span class="handle">tayooo23</span></a>
+      </div>
+      <div class="panel">
+        <h3>Blog — 最新記事</h3>
+        <a class="post" href="/blog/"><span class="date">2025-05-10</span><span class="ttl">個人開発を続けるために意識していること</span><span class="tag a">Dev</span></a>
+        <a class="post" href="/blog/"><span class="date">2025-04-22</span><span class="ttl">自分用ツールをサブドメインで公開してみた話</span><span class="tag r">Tools</span></a>
+        <a class="post" href="/blog/"><span class="date">2025-04-05</span><span class="ttl">アウトプットの習慣をどうやって作るか</span><span class="tag v">Essay</span></a>
+        <a class="more" href="/blog/">すべて見る →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2026 TAYOOO</footer>
 </div>
-
-<!-- ═══ Navigation ═══ -->
-<nav>
-  <a href="/" class="nav-logo">tay<span>ooo</span></a>
-  <button class="burger" id="burger" aria-label="メニュー" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-  <ul class="nav-links" id="nav-links" role="list">
-    <li><a href="#hero">Home</a></li>
-    <li><a href="#gallery">Gallery</a></li>
-    <li><a href="#blog">Blog</a></li>
-    <li><a href="#tools">Tools</a></li>
-    <li><a href="#profile">Profile</a></li>
-    <li><a href="https://game.tayooo.com">Games</a></li>
-  </ul>
-</nav>
-
-<!-- ═══ Hero ═══ -->
-<section id="hero">
-  <div class="hero-inner">
-    <div class="hero-left">
-      <p class="hero-eyebrow">Personal Site</p>
-      <h1 class="hero-title">tayooo</h1>
-      <p class="hero-en">just my space</p>
-      <p class="hero-ja">個人開発・写真・ブログをまとめた場所。<br>つくったものや日常を気ままに発信中。</p>
-      <div class="hero-sns">
-        <a href="https://x.com/tayooooo_23" target="_blank" rel="noopener noreferrer" class="sns-btn">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          X
-        </a>
-        <a href="https://instagram.com/2iru.2iru" target="_blank" rel="noopener noreferrer" class="sns-btn">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-          Instagram
-        </a>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <div class="avatar-wrap">
-        <img src="./images/avatar.png" alt="tayooo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="avatar-ph" style="display:none">
-          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ═══ Gallery ═══ -->
-<section id="gallery" class="sec">
-  <span class="v-label">gallery</span>
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2 class="sec-title">Gallery</h2>
-      <p class="sec-sub">photo &amp; visual</p>
-    </div>
-
-    <div class="gallery-grid">
-      <a href="/gallery/" class="g-item reveal reveal-d1">
-        <img src="./images/gallery/photo1.jpg" alt="photo 1" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-      <a href="/gallery/" class="g-item reveal reveal-d2">
-        <img src="./images/gallery/photo2.jpg" alt="photo 2" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-      <a href="/gallery/" class="g-item reveal reveal-d3">
-        <img src="./images/gallery/photo3.jpg" alt="photo 3" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-      <a href="/gallery/" class="g-item reveal reveal-d4">
-        <img src="./images/gallery/photo4.jpg" alt="photo 4" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-      <a href="/gallery/" class="g-item reveal reveal-d5">
-        <img src="./images/gallery/photo5.jpg" alt="photo 5" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-      <a href="/gallery/" class="g-item reveal reveal-d6">
-        <img src="./images/gallery/photo6.jpg" alt="photo 6" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="g-ph" style="display:none">📷</div>
-      </a>
-    </div>
-
-    <a href="/gallery/" class="see-all reveal">すべて見る →</a>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ═══ Blog ═══ -->
-<section id="blog" class="sec">
-  <span class="v-label">blog</span>
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2 class="sec-title">Blog</h2>
-      <p class="sec-sub">latest posts</p>
-    </div>
-  </div>
-
-  <div class="slider-outer" id="slider-outer">
-    <div class="slider-track" id="slider-track">
-      <!-- Original cards -->
-      <a href="/blog/" class="blog-card">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb1.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">✍️</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Dev</span>
-          <p class="blog-title">個人開発を続けるために意識していること</p>
-          <span class="blog-date">2025.05.10</span>
-        </div>
-      </a>
-      <a href="/blog/" class="blog-card">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb2.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">🛠️</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Tools</span>
-          <p class="blog-title">自分用ツールをサブドメインで公開してみた話</p>
-          <span class="blog-date">2025.04.22</span>
-        </div>
-      </a>
-      <a href="/blog/" class="blog-card">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb3.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">📝</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Essay</span>
-          <p class="blog-title">アウトプットの習慣をどうやって作るか</p>
-          <span class="blog-date">2025.04.05</span>
-        </div>
-      </a>
-      <!-- Duplicated for seamless loop -->
-      <a href="/blog/" class="blog-card" aria-hidden="true">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb1.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">✍️</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Dev</span>
-          <p class="blog-title">個人開発を続けるために意識していること</p>
-          <span class="blog-date">2025.05.10</span>
-        </div>
-      </a>
-      <a href="/blog/" class="blog-card" aria-hidden="true">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb2.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">🛠️</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Tools</span>
-          <p class="blog-title">自分用ツールをサブドメインで公開してみた話</p>
-          <span class="blog-date">2025.04.22</span>
-        </div>
-      </a>
-      <a href="/blog/" class="blog-card" aria-hidden="true">
-        <div class="blog-thumb">
-          <img src="./images/blog/thumb3.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="blog-thumb-ph" style="display:none">📝</div>
-        </div>
-        <div class="blog-body">
-          <span class="blog-tag">Essay</span>
-          <p class="blog-title">アウトプットの習慣をどうやって作るか</p>
-          <span class="blog-date">2025.04.05</span>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <div class="wrap">
-    <a href="/blog/" class="see-all reveal">すべて見る →</a>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ═══ Tools ═══ -->
-<section id="tools" class="sec">
-  <span class="v-label">tools</span>
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2 class="sec-title">Tools</h2>
-      <p class="sec-sub">my tools</p>
-    </div>
-
-    <div class="tools-list">
-      <a href="https://tools.tayooo.com" target="_blank" rel="noopener noreferrer" class="tool-item reveal">
-        <span class="tool-num">01</span>
-        <div class="tool-info">
-          <div class="tool-name">tayooo Tools</div>
-          <div class="tool-desc">IP確認・テキスト変換など、よく使う便利ツール集</div>
-        </div>
-        <span class="tool-url">tools.tayooo.com →</span>
-      </a>
-      <div class="tool-item tool-empty reveal reveal-d1">
-        <span class="tool-num" style="opacity:0.3">02</span>
-        <div class="tool-info">
-          <div class="tool-name" style="color:var(--border)">coming soon</div>
-        </div>
-      </div>
-      <div class="tool-item tool-empty reveal reveal-d2">
-        <span class="tool-num" style="opacity:0.3">03</span>
-        <div class="tool-info">
-          <div class="tool-name" style="color:var(--border)">coming soon</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ═══ Profile ═══ -->
-<section id="profile" class="sec">
-  <span class="v-label">profile</span>
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2 class="sec-title">Profile</h2>
-      <p class="sec-sub">about me</p>
-    </div>
-
-    <div class="profile-inner reveal">
-      <div class="profile-img">
-        <img src="./images/profile.jpg" alt="tayooo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="avatar-ph" style="display:none">
-          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-        </div>
-      </div>
-      <div class="profile-body">
-        <h3 class="profile-name">tayooo</h3>
-        <p class="profile-handle">@tayooo23</p>
-        <p class="profile-bio">
-          個人開発・写真・ブログをやっています。<br>
-          作ったものや気になったことを気ままに発信中。<br>
-          tools.tayooo.com で便利ツールも公開中。
-        </p>
-        <a href="/profile/" class="see-all" style="margin-top:1.25rem">もっと見る →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ═══ Footer ═══ -->
-<footer>
-  <div class="footer-inner">
-    <span class="footer-copy">© 2025 tayooo</span>
-    <div class="footer-sns">
-      <a href="https://x.com/tayooooo_23" target="_blank" rel="noopener noreferrer" aria-label="X">
-        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
-      <a href="https://instagram.com/2iru.2iru" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-      </a>
-    </div>
-  </div>
-</footer>
-
-<script>
-/* ── Loading ── */
-(function(){
-  const loader  = document.getElementById('loader');
-  const bar     = document.getElementById('loader-bar');
-  const numEl   = document.getElementById('loader-num');
-  let pct = 0;
-  const step = () => {
-    pct += Math.random() * 4 + 1.5;
-    if(pct >= 100){ pct = 100 }
-    bar.style.width = pct + '%';
-    numEl.textContent = Math.floor(pct);
-    if(pct < 100){
-      setTimeout(step, 28);
-    } else {
-      setTimeout(() => {
-        loader.classList.add('hide');
-        setTimeout(() => { loader.style.display='none'; }, 700);
-      }, 180);
-    }
-  };
-  document.addEventListener('DOMContentLoaded', step);
-})();
-
-/* ── Burger ── */
-const burger    = document.getElementById('burger');
-const navLinks  = document.getElementById('nav-links');
-burger.addEventListener('click', () => {
-  const open = navLinks.classList.toggle('open');
-  burger.classList.toggle('open', open);
-  burger.setAttribute('aria-expanded', open);
-});
-navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-  navLinks.classList.remove('open');
-  burger.classList.remove('open');
-  burger.setAttribute('aria-expanded','false');
-}));
-
-/* ── Scroll reveal ── */
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-  });
-}, { threshold: 0.07, rootMargin:'0px 0px -28px 0px' });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-/* ── Blog slider – touch/drag ── */
-(function(){
-  const outer = document.getElementById('slider-outer');
-  const track = document.getElementById('slider-track');
-  let isDown = false, startX = 0, scrollLeft = 0;
-
-  outer.addEventListener('mousedown', e => {
-    isDown = true;
-    startX = e.pageX - outer.offsetLeft;
-    scrollLeft = outer.scrollLeft;
-    track.style.animationPlayState = 'paused';
-  });
-  outer.addEventListener('mouseleave', () => {
-    isDown = false;
-    track.style.animationPlayState = '';
-  });
-  outer.addEventListener('mouseup', () => {
-    isDown = false;
-    track.style.animationPlayState = '';
-  });
-  outer.addEventListener('mousemove', e => {
-    if(!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - outer.offsetLeft;
-    outer.scrollLeft = scrollLeft - (x - startX);
-  });
-
-  // Touch
-  outer.addEventListener('touchstart', e => {
-    startX = e.touches[0].pageX;
-    scrollLeft = outer.scrollLeft;
-    track.style.animationPlayState = 'paused';
-  }, {passive:true});
-  outer.addEventListener('touchend', () => { track.style.animationPlayState = ''; });
-  outer.addEventListener('touchmove', e => {
-    const x = e.touches[0].pageX;
-    outer.scrollLeft = scrollLeft - (x - startX);
-  }, {passive:true});
-})();
-</script>
 </body>
 </html>
