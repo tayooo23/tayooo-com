@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MACアドレス検索 — tayooo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:24px;margin-top:28px;}
+  .card h2{font-size:12px;font-weight:900;letter-spacing:.3em;color:#A79BA8;margin-bottom:18px;}
+  @media (max-width:700px){.card{padding:18px 14px;}}
+
+  .field label{display:block;font-size:12px;font-weight:900;letter-spacing:.14em;color:#6E6A7E;margin-bottom:8px;}
+  input[type=text]{width:100%;font-family:Consolas,"Courier New",monospace;font-size:19px;font-weight:700;color:var(--ink);border:2.5px solid var(--ink);border-radius:10px;padding:11px 14px;background:#FFFDF9;outline:none;letter-spacing:.05em;text-transform:uppercase;}
+  input[type=text]:focus{border-color:var(--accent);}
+  input[type=text]::placeholder{color:#C4BBAE;font-weight:500;text-transform:none;}
+  input[type=text].bad{border-color:var(--accent);background:#FFF1E8;}
+  .err{display:none;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--accent);}
+  .err.on{display:block;}
+  .hint{margin-top:8px;font-size:12.5px;color:#A79BA8;font-weight:500;}
+
+  .result-main{border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);padding:16px 18px;text-align:center;margin-bottom:6px;}
+  .result-main .label{font-size:10.5px;font-weight:900;letter-spacing:.3em;color:#A79BA8;}
+  .result-main .vendor{font-size:25px;font-weight:900;line-height:1.35;margin-top:5px;word-break:break-word;}
+  .result-main .vendor.none{font-size:17px;color:#A79BA8;}
+  @media (max-width:700px){.result-main .vendor{font-size:20px;}}
+
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:2px dashed #E4DCCF;}
+  .rrow:last-child{border-bottom:none;}
+  .rrow .k{flex:0 0 150px;font-size:13px;font-weight:900;color:#6E6A7E;letter-spacing:.04em;}
+  .rrow .v{flex:1;font-family:Consolas,monospace;font-size:16px;font-weight:700;word-break:keep-all;overflow-wrap:break-word;}
+  .rrow .v.jp{font-family:"Noto Sans JP",sans-serif;font-size:14.5px;}
+  .copy{flex:none;font-family:"Noto Sans JP",sans-serif;font-size:11px;font-weight:900;border:2px solid var(--ink);border-radius:999px;padding:3px 12px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 var(--ink);}
+  .copy:hover{background:#FFE9DC;}
+  .copy.done{background:var(--accent);color:#fff;}
+  @media (max-width:700px){.rrow .k{flex-basis:112px;font-size:12px;}.rrow .v{font-size:14px;}}
+  .note{margin-top:14px;font-size:12.5px;color:#A79BA8;font-weight:500;line-height:1.7;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">TOOL/MAC-LOOKUP</div>
+    <a class="back" href="/tool/">← tool 一覧</a>
+    <h1>mac lookup<span class="dot">.</span></h1>
+    <p>MACアドレスから、ベンダー（製造元）を検索する。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h2>INPUT — 入力</h2>
+    <div class="field">
+      <label for="macInput">MACアドレス</label>
+      <input type="text" id="macInput" value="" placeholder="例：C4:C1:7D:12:34:56" autocomplete="off" spellcheck="false">
+      <div class="err" id="macErr">MACアドレスの形式が正しくありません（16進数で入力してください）</div>
+      <div class="hint">区切りは「:」「-」「.」でも、区切りなしでもOK。先頭3オクテット（プレフィックス）だけでも検索できます。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>VENDOR — ベンダー情報</h2>
+    <div class="result-main">
+      <div class="label">VENDOR</div>
+      <div class="vendor none" id="rVendor">MACアドレスを入力すると表示されます</div>
+    </div>
+    <div id="vendorRows"></div>
+    <p class="note" id="vendorNote"></p>
+    <p class="note">データ出典：IEEE OUIレジストリ（MA-L／MA-S、2026-11-05取得時点）。ベンダーの住所は掲載していません。</p>
+  </div>
+
+  <div class="card">
+    <h2>ADDRESS — アドレスの情報</h2>
+    <div id="addrRows"></div>
+  </div>
+
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+
+<script src="vendors.js"></script>
+<script>
+  const macInput = document.getElementById('macInput');
+  const macErr = document.getElementById('macErr');
+  const rVendor = document.getElementById('rVendor');
+  const vendorRows = document.getElementById('vendorRows');
+  const vendorNote = document.getElementById('vendorNote');
+  const addrRows = document.getElementById('addrRows');
+
+  const COUNTRIES = {US:'アメリカ',CN:'中国',JP:'日本',TW:'台湾',KR:'韓国',DE:'ドイツ',GB:'イギリス',FR:'フランス',IT:'イタリア',NL:'オランダ',SE:'スウェーデン',FI:'フィンランド',DK:'デンマーク',NO:'ノルウェー',CH:'スイス',AT:'オーストリア',ES:'スペイン',PT:'ポルトガル',PL:'ポーランド',CZ:'チェコ',HU:'ハンガリー',IE:'アイルランド',BE:'ベルギー',IL:'イスラエル',IN:'インド',SG:'シンガポール',HK:'香港',AU:'オーストラリア',NZ:'ニュージーランド',CA:'カナダ',MX:'メキシコ',BR:'ブラジル',ZA:'南アフリカ',RU:'ロシア',UA:'ウクライナ',TR:'トルコ',TH:'タイ',VN:'ベトナム',MY:'マレーシア',ID:'インドネシア',PH:'フィリピン',AE:'UAE',SA:'サウジアラビア',EG:'エジプト',GR:'ギリシャ',RO:'ルーマニア',BG:'ブルガリア',HR:'クロアチア',SK:'スロバキア',SI:'スロベニア',LT:'リトアニア',LV:'ラトビア',EE:'エストニア',IS:'アイスランド',LU:'ルクセンブルク'};
+
+  function normalize(str) {
+    return String(str).toUpperCase().replace(/[^0-9A-F]/g, '');
+  }
+  function colon(hex) {
+    return hex.replace(/(.{2})(?=.)/g, '$1:');
+  }
+  function rowHtml(k, v, jp, copyText) {
+    return '<div class="rrow"><div class="k">' + k + '</div><div class="v' + (jp ? ' jp' : '') + '">' + v + '</div>' +
+      (copyText ? '<button class="copy" data-t="' + copyText + '">コピー</button>' : '') + '</div>';
+  }
+
+  function render() {
+    const raw = macInput.value.trim();
+    const hex = normalize(raw);
+    const validChars = raw === '' || /^[0-9A-Fa-f:.\-\s]+$/.test(raw);
+    const bad = !validChars || hex.length > 12;
+    macErr.classList.toggle('on', bad && raw !== '');
+    macInput.classList.toggle('bad', bad && raw !== '');
+
+    if (raw === '' || bad || hex.length < 6) {
+      rVendor.textContent = raw === '' ? 'MACアドレスを入力すると表示されます' : (hex.length < 6 && !bad ? 'あと ' + (6 - hex.length) + ' 文字で検索できます' : '—');
+      rVendor.classList.add('none');
+      vendorRows.innerHTML = '';
+      addrRows.innerHTML = '';
+      vendorNote.textContent = '';
+      return;
+    }
+
+    const firstOctet = parseInt(hex.slice(0, 2), 16);
+    const isLocal = (firstOctet & 0x02) !== 0;
+    const isMulticast = (firstOctet & 0x01) !== 0;
+
+    // longest-prefix match: 9 (MA-S) -> 7 (MA-M) -> 6 (MA-L)
+    let matchKey = null, entry = null;
+    for (const len of [9, 7, 6]) {
+      if (hex.length >= len && window.MAC_OUI.d[hex.slice(0, len)]) {
+        matchKey = hex.slice(0, len);
+        entry = window.MAC_OUI.d[matchKey];
+        break;
+      }
+    }
+
+    if (entry) {
+      const vendor = window.MAC_OUI.v[entry[0]];
+      const cc = entry[1];
+      const bits = matchKey.length * 4;
+      const start = (matchKey + '0'.repeat(12 - matchKey.length)).slice(0, 12);
+      const end = (matchKey + 'F'.repeat(12 - matchKey.length)).slice(0, 12);
+      const type = matchKey.length === 6 ? 'MA-L' : matchKey.length === 7 ? 'MA-M' : 'MA-S';
+      rVendor.textContent = vendor;
+      rVendor.classList.remove('none');
+      vendorRows.innerHTML =
+        rowHtml('MACプレフィックス', colon(matchKey), false, colon(matchKey)) +
+        rowHtml('MACレンジ', colon(start) + ' 〜<br>' + colon(end), false, null) +
+        rowHtml('ブロック種別', type + '（' + bits + ' bit）', false, null) +
+        (cc ? rowHtml('国・地域', (COUNTRIES[cc] ? COUNTRIES[cc] + '（' + cc + '）' : cc), true, null) : '');
+      vendorNote.textContent = '';
+    } else {
+      rVendor.textContent = '見つかりませんでした';
+      rVendor.classList.add('none');
+      vendorRows.innerHTML = '';
+      vendorNote.textContent = isLocal
+        ? 'このアドレスはローカル管理アドレスのため、ベンダー登録はありません。スマートフォン等の「ランダムMACアドレス」の可能性があります。'
+        : 'このプレフィックスの登録は、IEEEレジストリ（MA-L／MA-S）に見つかりませんでした。';
+    }
+
+    if (hex.length === 12) {
+      const hyphen = hex.replace(/(.{2})(?=.)/g, '$1-');
+      const dotted = hex.replace(/(.{4})(?=.)/g, '$1.');
+      addrRows.innerHTML =
+        rowHtml('アドレス種別', isMulticast ? 'マルチキャスト' : 'ユニキャスト', true, null) +
+        rowHtml('管理種別', isLocal ? 'ローカル管理（ランダムMAC等）' : 'グローバル（ベンダー割当）', true, null) +
+        rowHtml('コロン表記', colon(hex), false, colon(hex)) +
+        rowHtml('ハイフン表記', hyphen, false, hyphen) +
+        rowHtml('ドット表記', dotted, false, dotted) +
+        rowHtml('区切りなし', hex, false, hex);
+    } else {
+      addrRows.innerHTML =
+        rowHtml('アドレス種別', isMulticast ? 'マルチキャスト' : 'ユニキャスト', true, null) +
+        rowHtml('管理種別', isLocal ? 'ローカル管理（ランダムMAC等）' : 'グローバル（ベンダー割当）', true, null) +
+        '<p class="note">アドレス全体（12桁）を入力すると、表記変換も表示します。</p>';
+    }
+  }
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.copy');
+    if (!btn) return;
+    const done = () => { btn.textContent = '✓'; btn.classList.add('done'); setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('done'); }, 1100); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(btn.dataset.t).then(done).catch(done);
+    else done();
+  });
+
+  macInput.addEventListener('input', render);
+  render();
+</script>
+<script src="/season.js" defer></script>
+</body>
+</html>
