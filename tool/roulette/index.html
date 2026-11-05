@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>重み付きルーレット — tayooo</title>
+<title>ルーレット — tayooo</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,10 +47,10 @@
   .btn:disabled{opacity:.55;cursor:default;transform:none;}
 
   .rows{margin-top:26px;display:flex;flex-direction:column;gap:12px;}
-  .row{display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:10px 14px;background:#FFFDF9;flex-wrap:wrap;}
+  .row{position:relative;display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:10px 58px 10px 14px;background:#FFFDF9;flex-wrap:wrap;}
   .row .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);flex:none;}
   .row .num{font-family:Consolas,monospace;font-weight:700;font-size:14px;color:#A79BA8;width:16px;text-align:right;flex:none;}
-  .row input.name{flex:1;min-width:130px;font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--ink);border-radius:9px;padding:8px 12px;background:#fff;outline:none;}
+  .row input.name{flex:1 1 150px;max-width:250px;min-width:120px;font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--ink);border-radius:9px;padding:8px 12px;background:#fff;outline:none;}
   .row input.name:focus{border-color:var(--accent);}
   .row .w{display:flex;align-items:center;gap:8px;flex:none;}
   .row .w .wlabel{font-size:11px;font-weight:900;letter-spacing:.08em;color:#6E6A7E;}
@@ -60,8 +60,8 @@
   .row input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
   .row .wv{font-family:Consolas,monospace;font-weight:700;font-size:15px;width:20px;text-align:center;}
   .row .pct{font-family:Consolas,monospace;font-size:12px;color:#A79BA8;width:44px;text-align:right;}
-  .row .del{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);background:#fff;font-size:15px;font-weight:900;line-height:1;cursor:pointer;color:var(--ink);}
-  .row .del:hover{background:#FFE9DC;color:var(--accent);}
+  .row .del{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:2px solid var(--accent);background:#fff;font-size:15px;font-weight:900;line-height:1;cursor:pointer;color:var(--accent);}
+  .row .del:hover{background:#FFE9DC;}
   .rows.single .del{visibility:hidden;}
   .addbtn{margin-top:14px;width:100%;font-family:"Noto Sans JP",sans-serif;font-size:14px;font-weight:900;color:var(--ink);background:#fff;border:2.5px dashed #CBBFAE;border-radius:12px;padding:12px;cursor:pointer;transition:border-color .12s ease,color .12s ease;}
   .addbtn:hover{border-color:var(--accent);color:var(--accent);}
@@ -73,10 +73,10 @@
 <body>
 <div class="wrap">
   <div class="hero">
-    <div class="kicker">TAYOOO.COM/TOOL/ROULETTE</div>
+    <div class="kicker">TOOL/ROULETTE</div>
     <a class="back" href="/tool/">← tool 一覧</a>
     <h1>roulette<span class="dot">.</span></h1>
-    <p>重み付きルーレット — 当たりやすさを変えられる抽選ツール。</p>
+    <p>当たりやすさ（重み）を変えられる抽選ツール。</p>
     <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
       <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
