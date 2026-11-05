@@ -47,26 +47,26 @@
   .btn:disabled{opacity:.55;cursor:default;transform:none;}
 
   .rows{margin-top:26px;display:flex;flex-direction:column;gap:12px;}
-  .row{position:relative;display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:10px 58px 10px 14px;background:#FFFDF9;flex-wrap:wrap;}
+  .row{position:relative;display:flex;align-items:center;gap:10px 12px;border:2px solid #E4DCCF;border-radius:12px;padding:12px 14px;background:#FFFDF9;flex-wrap:wrap;}
   .row .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);flex:none;}
   .row .num{font-family:Consolas,monospace;font-weight:700;font-size:14px;color:#A79BA8;width:16px;text-align:right;flex:none;}
-  .row input.name{flex:1 1 150px;max-width:250px;min-width:120px;font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--ink);border-radius:9px;padding:8px 12px;background:#fff;outline:none;}
+  .row input.name{flex:1 1 140px;max-width:250px;min-width:0;font-family:"Noto Sans JP",sans-serif;font-size:16px;font-weight:700;color:var(--ink);border:2px solid var(--ink);border-radius:9px;padding:8px 12px;background:#fff;outline:none;}
   .row input.name:focus{border-color:var(--accent);}
-  .row .w{display:flex;align-items:center;gap:8px;flex:none;}
+  .row .w{display:flex;align-items:center;gap:8px;flex:1 1 230px;min-width:0;}
   .row .w .wlabel{font-size:11px;font-weight:900;letter-spacing:.08em;color:#6E6A7E;}
   .row .w .minmax{font-family:Consolas,monospace;font-size:10.5px;color:#A79BA8;}
-  .row input[type=range]{-webkit-appearance:none;appearance:none;width:130px;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--salmon),var(--sky));border:2px solid var(--ink);outline:none;cursor:pointer;}
+  .row input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 auto;width:auto;min-width:70px;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--salmon),var(--sky));border:2px solid var(--ink);outline:none;cursor:pointer;}
   .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
   .row input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
   .row .wv{font-family:Consolas,monospace;font-weight:700;font-size:15px;width:20px;text-align:center;}
   .row .pct{font-family:Consolas,monospace;font-size:12px;color:#A79BA8;width:44px;text-align:right;}
-  .row .del{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:2px solid var(--accent);background:#fff;font-size:15px;font-weight:900;line-height:1;cursor:pointer;color:var(--accent);}
+  .row .del{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--accent);background:#fff;font-size:15px;font-weight:900;line-height:1;cursor:pointer;color:var(--accent);padding:0;}
   .row .del:hover{background:#FFE9DC;}
   .rows.single .del{visibility:hidden;}
   .addbtn{margin-top:14px;width:100%;font-family:"Noto Sans JP",sans-serif;font-size:14px;font-weight:900;color:var(--ink);background:#fff;border:2.5px dashed #CBBFAE;border-radius:12px;padding:12px;cursor:pointer;transition:border-color .12s ease,color .12s ease;}
   .addbtn:hover{border-color:var(--accent);color:var(--accent);}
   .note{margin-top:16px;font-size:12px;color:#A79BA8;text-align:center;font-weight:500;}
-  @media (max-width:700px){.card{padding:18px 14px;}.row{gap:8px;}.row input[type=range]{width:104px;}.winner .name{font-size:25px;}}
+  @media (max-width:700px){.card{padding:18px 14px;}.row{gap:8px 10px;}.winner .name{font-size:25px;}}
 </style>
 </head>
 
@@ -221,12 +221,12 @@
       '<span class="dot"></span>' +
       '<span class="num"></span>' +
       '<input class="name" type="text" maxlength="20" placeholder="名前を入力">' +
+      '<button class="del" aria-label="削除">×</button>' +
       '<div class="w"><span class="wlabel">重み</span>' +
       '<span class="minmax">1</span>' +
       '<input type="range" min="1" max="10" step="1">' +
       '<span class="minmax">10</span>' +
-      '<span class="wv"></span><span class="pct"></span></div>' +
-      '<button class="del" aria-label="削除">×</button>';
+      '<span class="wv"></span><span class="pct"></span></div>';
     const nameInput = row.querySelector('.name');
     const range = row.querySelector('input[type=range]');
     nameInput.value = entries[i].name;
