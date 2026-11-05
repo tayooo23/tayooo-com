@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>blog. — tayooo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23875e5c'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:56px;font-weight:900;line-height:1.02;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:70px;}
+  .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#fff;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;white-space:nowrap;}
+  .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:38px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:48px;}}
+
+  .posts{display:flex;flex-direction:column;gap:16px;margin-top:30px;}
+  .post{background:#fff;border:2.5px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:18px 22px;display:flex;align-items:center;gap:16px;transition:transform .12s ease,box-shadow .12s ease;}
+  .post:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink);}
+  .post .date{font-family:Consolas,monospace;font-size:12.5px;color:#A79BA8;white-space:nowrap;}
+  .post .ttl{font-size:16px;font-weight:900;line-height:1.45;flex:1;}
+  @media (max-width:700px){.post{flex-wrap:wrap;gap:8px;padding:14px 16px;}.post .ttl{flex-basis:100%;order:3;font-size:14.5px;}.post .tag{margin-left:auto;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">TAYOOO.COM/BLOG</div>
+    <a class="back" href="/">← tayooo.com</a>
+    <h1>blog<span class="dot">.</span></h1>
+    <p>他力本願競馬と技術メモ、そのほか書き散らし。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+  <main class="posts">
+    <a class="post" href="/blog/keep-indie-dev/"><span class="date">2025-05-10</span><span class="ttl">個人開発を続けるために意識していること</span><span class="tag a">Dev</span></a>
+    <a class="post" href="/blog/tools-on-subdomain/"><span class="date">2025-04-22</span><span class="ttl">自分用ツールをサブドメインで公開してみた話</span><span class="tag r">Tools</span></a>
+    <a class="post" href="/blog/output-habit/"><span class="date">2025-04-05</span><span class="ttl">アウトプットの習慣をどうやって作るか</span><span class="tag v">Essay</span></a>
+  </main>
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+</body>
+</html>
