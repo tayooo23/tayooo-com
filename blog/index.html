@@ -25,7 +25,13 @@
   .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
   .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:70px;}
   .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#fff;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;white-space:nowrap;}
-  .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);}
+  .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);} .tag.k{background:var(--mauve);}
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+  .fbtn{font-family:"Noto Sans JP",sans-serif;font-size:12px;font-weight:900;border:2.2px solid var(--ink);border-radius:999px;padding:5px 16px;background:#fff;color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;}
+  .fbtn:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink);}
+  .fbtn.on{background:var(--ink);color:#fff;}
+  .empty{display:none;background:#fff;border:2.5px dashed #CBBFAE;border-radius:14px;padding:26px;text-align:center;font-size:13.5px;font-weight:700;color:#A79BA8;margin-top:16px;}
+  .empty.show{display:block;}
   footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
   footer a:hover{color:#C9502E;}
   @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:38px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:48px;}}
@@ -52,11 +58,36 @@
       <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
     </svg>
   </div>
+  <div class="filters" role="group" aria-label="カテゴリで絞り込み">
+    <button class="fbtn on" data-filter="all">すべて</button>
+    <button class="fbtn" data-filter="keiba">Keiba</button>
+    <button class="fbtn" data-filter="dev">Dev</button>
+    <button class="fbtn" data-filter="tools">Tools</button>
+    <button class="fbtn" data-filter="essay">Essay</button>
+  </div>
   <main class="posts">
-    <a class="post" href="/blog/keep-indie-dev/"><span class="date">2025-05-10</span><span class="ttl">個人開発を続けるために意識していること</span><span class="tag a">Dev</span></a>
-    <a class="post" href="/blog/tools-on-subdomain/"><span class="date">2025-04-22</span><span class="ttl">自分用ツールをサブドメインで公開してみた話</span><span class="tag r">Tools</span></a>
-    <a class="post" href="/blog/output-habit/"><span class="date">2025-04-05</span><span class="ttl">アウトプットの習慣をどうやって作るか</span><span class="tag v">Essay</span></a>
+    <a class="post" data-tag="keiba" href="/blog/tennosho-aki-2026/"><span class="date">2026-11-01</span><span class="ttl">第174回 天皇賞（秋）回顧 — 他力本願競馬</span><span class="tag k">Keiba</span></a>
+    <a class="post" data-tag="dev" href="/blog/keep-indie-dev/"><span class="date">2025-05-10</span><span class="ttl">個人開発を続けるために意識していること</span><span class="tag a">Dev</span></a>
+    <a class="post" data-tag="tools" href="/blog/tools-on-subdomain/"><span class="date">2025-04-22</span><span class="ttl">自分用ツールをサブドメインで公開してみた話</span><span class="tag r">Tools</span></a>
+    <a class="post" data-tag="essay" href="/blog/output-habit/"><span class="date">2025-04-05</span><span class="ttl">アウトプットの習慣をどうやって作るか</span><span class="tag v">Essay</span></a>
   </main>
+  <div class="empty" id="empty">このカテゴリの記事はまだありません。</div>
+  <script>
+    const btns = document.querySelectorAll('.fbtn');
+    const posts = document.querySelectorAll('.post[data-tag]');
+    const empty = document.getElementById('empty');
+    btns.forEach(b => b.addEventListener('click', () => {
+      btns.forEach(x => x.classList.toggle('on', x === b));
+      const f = b.dataset.filter;
+      let shown = 0;
+      posts.forEach(p => {
+        const hit = (f === 'all' || p.dataset.tag === f);
+        p.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      empty.classList.toggle('show', shown === 0);
+    }));
+  </script>
   <footer><a href="/">© 2026 TAYOOO</a></footer>
 </div>
 </body>
