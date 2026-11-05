@@ -16,19 +16,11 @@
   body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
   a{text-decoration:none;color:inherit;}
   .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
-  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
-  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
-  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
-  .hero .back:hover{color:#fff;text-decoration:underline;}
-  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:56px;font-weight:900;line-height:1.02;margin-top:6px;color:#fff;}
-  .hero h1 .dot{color:#FFD9AE;}
-  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
-  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:70px;}
   .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#fff;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;white-space:nowrap;}
   .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);} .tag.k{background:var(--mauve);}
   footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
   footer a:hover{color:#C9502E;}
-  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:38px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:48px;}}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}}
 
   .backlink{display:inline-block;margin-top:26px;font-size:12.5px;font-weight:700;color:#8A7F8C;}
   .backlink:hover{color:#C9502E;}
@@ -36,11 +28,33 @@
   .meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
   .meta .date{font-family:Consolas,monospace;font-size:12.5px;color:#A79BA8;}
   article h1{font-size:27px;font-weight:900;line-height:1.45;margin-bottom:22px;}
+  article h2{font-size:19px;font-weight:900;line-height:1.4;margin:30px 0 12px;padding-left:12px;border-left:6px solid #C9502E;}
+  article h2:first-of-type{margin-top:6px;}
   article p{font-size:14.5px;font-weight:500;line-height:1.95;margin-bottom:16px;color:#33334D;}
+  article ul{margin:0 0 16px 20px;}
+  article li{font-size:14.5px;font-weight:500;line-height:1.9;color:#33334D;margin-bottom:4px;}
+  .spec{background:var(--paper);border:2px solid #E4DCCF;border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:2;font-weight:500;color:#33334D;}
+  .spec b{font-weight:900;color:var(--ink);}
+  table{width:100%;border-collapse:collapse;margin:6px 0 20px;font-size:13.5px;}
+  th,td{border:1.8px solid var(--ink);padding:7px 10px;text-align:left;line-height:1.5;}
+  th{background:var(--paper);font-weight:900;font-size:12.5px;letter-spacing:.04em;}
+  td.num,th.num{text-align:center;white-space:nowrap;}
+  tr.win td{background:#FFE9DC;font-weight:700;}
+  .miss{color:#A79BA8;white-space:nowrap;}
+  .marks{margin-bottom:8px;}
+  .mark{border:2px solid #E4DCCF;border-radius:12px;padding:12px 16px;margin-bottom:10px;background:#FFFDF9;}
+  .mark .mh{font-size:15.5px;font-weight:900;}
+  .mark .mh .res{color:#C9502E;margin-left:8px;}
+  .mark p{font-size:13px;line-height:1.8;margin:4px 0 0;color:#5A5468;}
+  .balance{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 20px;}
+  .balance .b{flex:1;min-width:130px;border:2.2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);padding:10px 16px;text-align:center;background:#fff;}
+  .balance .b .l{font-size:11px;font-weight:900;letter-spacing:.14em;color:#A79BA8;}
+  .balance .b .v{font-size:22px;font-weight:900;line-height:1.35;}
+  .balance .b.neg .v{color:#4a5a75;}
   .toindex{margin-top:22px;text-align:center;}
   .toindex a{font-size:12.5px;font-weight:900;border:2px solid var(--ink);border-radius:999px;padding:6px 18px;background:#fff;display:inline-block;}
   .toindex a:hover{background:#F3E7DA;}
-  @media (max-width:700px){article{padding:22px 18px;}article h1{font-size:21px;}}
+  @media (max-width:700px){article{padding:22px 18px;}article h1{font-size:21px;}table{font-size:12.5px;}th,td{padding:6px 7px;}}
 </style>
 </head>
 
@@ -50,9 +64,81 @@
   <article>
     <div class="meta"><span class="tag k">Keiba</span><span class="date">2026-11-01</span></div>
     <h1>第174回 天皇賞（秋）回顧 — 他力本願競馬</h1>
-    <p>2026年の天皇賞（秋）は第174回。他力本願競馬として買い目20点を組んで臨んだ。</p>
-    <p>結果は全滅。20点すべて不的中で、収支は −2,000円に確定した。他力に本願をかけすぎた、というのが正直な回顧である。</p>
-    <p>買い目の詳細と反省点はNotionの「他力本願競馬」に記録してある。次のG1では、せめて1点は拾える組み立てにしたい。</p>
+
+    <p>「他力本願競馬」は、予想をAIに丸投げして、その買い目どおりに馬券を買ってみる企画である。軍資金は2,000円、1点100円×20点。第1回の舞台は、秋の古馬中距離王決定戦・天皇賞（秋）だ。</p>
+    <p>結論から書くと、<b>20点すべて不的中、収支は−2,000円</b>。しかも負け方がなかなか味わい深い。勝ち馬と3着馬には印が打ってあったのに、2着馬が完全にノーマークで、組み合わせが1点も拾えなかった——という回顧である。</p>
+
+    <h2>レース概要</h2>
+    <div class="spec">
+      <b>第174回 天皇賞（秋）（G1）</b><br>
+      2026年11月1日（日）15:40発走 ／ 東京競馬場・芝2000m ／ 17頭立て<br>
+      馬場：良（晴）／ 勝ちタイム：1分56秒7
+    </div>
+    <p>過去10年の傾向は「頭は堅く、ヒモは荒れる」。1番人気は7勝・3着内率80%で、勝ち馬はすべて3番人気以内。一方で2・3着には6〜9番人気がよく食い込む。そこで戦法は「軸は上位人気のまま、相手に6〜9番人気の中穴を絡める」に決まった。</p>
+
+    <h2>AIの予想（印）</h2>
+    <div class="marks">
+      <div class="mark">
+        <div class="mh">◎ 1番 クロワデュノール<span class="res">→ 5着</span></div>
+        <p>1枠1番・C.デムーロ騎乗、想定1番人気（2.1倍）。今年の大阪杯と天皇賞（春）の勝ち馬で、前走の宝塚記念も2着。最内枠から春秋天皇賞制覇を狙う、というのが本命の理由。</p>
+      </div>
+      <div class="mark">
+        <div class="mh">○ 7番 マスカレードボール<span class="res">→ 11着</span></div>
+        <p>4枠7番・ルメール騎乗、想定2番人気（3.7倍）。昨年のこのレースの勝ち馬で連覇がかかる。7番はこのレースと相性のいい馬番、という後押しもあった。</p>
+      </div>
+      <div class="mark">
+        <div class="mh">▲ 17番 ダノンデサイル<span class="res">→ 1着</span></div>
+        <p>8枠17番・戸崎圭太騎乗、想定3番人気（10.1倍）。宝塚記念3着の安定感と、左回りの東京との相性が評価点。大外17番だけが試練と見ていた。</p>
+      </div>
+      <div class="mark">
+        <div class="mh">△ 13番 リアライズシリウス ／ 3番 レガレイラ<span class="res">→ レガレイラ3着</span></div>
+        <p>リアライズシリウスは7枠13番・津村騎乗、想定6番人気。レガレイラは2枠3番・岩田望来騎乗、想定7番人気で、G1馬の実績を買っての押さえ。</p>
+      </div>
+      <div class="mark">
+        <div class="mh">△ 6番 セイウンハーデス ／ 11番 シェイクユアハート</div>
+        <p>セイウンハーデスは3枠6番・幸騎乗、想定8番人気。前走の毎日王冠を勝って好調。シェイクユアハートは6枠11番・古川吉騎乗、想定9番人気。中穴の本線として相手に組み込んだ。</p>
+      </div>
+    </div>
+
+    <h2>買い目（100円×20点＝2,000円）</h2>
+    <p>配分は安定12点（1,200円）と大穴8点（800円）。軸2頭（◎○）を中心に、▲と△へ流す組み立てにした。</p>
+    <table>
+      <tr><th>区分</th><th>馬券</th><th>組み合わせ</th><th class="num">結果</th></tr>
+      <tr><td rowspan="4">安定</td><td>ワイド</td><td>1-7 ／ 1-17 ／ 7-17</td><td class="num miss">不的中</td></tr>
+      <tr><td>ワイド</td><td>1-13 ／ 1-3 ／ 7-13</td><td class="num miss">不的中</td></tr>
+      <tr><td>馬連</td><td>1-7 ／ 1-17 ／ 7-17</td><td class="num miss">不的中</td></tr>
+      <tr><td>三連複</td><td>1-7-17 ／ 1-7-13 ／ 1-7-3</td><td class="num miss">不的中</td></tr>
+      <tr><td rowspan="2">大穴</td><td>三連複</td><td>1-17-6 ／ 7-17-11 ／ 1-13-3 ／ 7-13-3</td><td class="num miss">不的中</td></tr>
+      <tr><td>三連単</td><td>1→7→13 ／ 7→1→3 ／ 1→17→7 ／ 7→3→1</td><td class="num miss">不的中</td></tr>
+    </table>
+    <p>券種ごとの内訳は、ワイド6点・馬連3点・三連複7点・三連単4点。どの買い目にも「1番か7番」が必ず入っているのが、後から見ると最大の弱点だった。</p>
+
+    <h2>レース結果</h2>
+    <table>
+      <tr><th class="num">着順</th><th class="num">馬番</th><th>馬名</th><th>騎手</th><th class="num">人気</th><th>印</th></tr>
+      <tr class="win"><td class="num">1着</td><td class="num">17</td><td>ダノンデサイル</td><td>戸崎圭太</td><td class="num">4番人気</td><td>▲</td></tr>
+      <tr><td class="num">2着</td><td class="num">10</td><td>ネブラディスク</td><td>川田将雅</td><td class="num">8番人気</td><td>—（無印）</td></tr>
+      <tr><td class="num">3着</td><td class="num">3</td><td>レガレイラ</td><td>岩田望来</td><td class="num">3番人気</td><td>△</td></tr>
+    </table>
+    <p>払戻金は、単勝17番が1,080円、馬連10-17が12,970円、ワイドは10-17が3,330円・3-17が1,290円・3-10が5,060円。三連複3-10-17は42,010円、三連単17→10→3は<b>297,820円</b>の大万馬券になった。</p>
+    <p>勝ったのは▲ダノンデサイル。想定3番人気が4番人気に落ちての勝利で、「大外は試練」という読みは杞憂に終わった。3着にも△レガレイラが入っている。つまり馬券圏内3頭のうち2頭には印があった。それなのに、なぜ全滅したのか。</p>
+
+    <h2>なぜ全滅したか</h2>
+    <ul>
+      <li><b>軸が2頭とも崩れた。</b>◎クロワデュノールは5着、○マスカレードボールは11着。全20点がこの2頭のどちらかを含む組み立てだったため、軸の敗退＝全滅が確定した。</li>
+      <li><b>2着馬がノーマークだった。</b>8番人気ネブラディスクは「中穴を絡める」という戦法の想定レンジ（6〜9番人気）ど真ん中だったのに、印がなく、買い目に1点も入っていなかった。ヒモ荒れ自体は読めていたのに、肝心の1頭を取りこぼした。</li>
+      <li><b>印のある馬同士の組み合わせがなかった。</b>▲17と△3を直接結ぶ買い目（ワイド17-3など）がなく、勝ち馬と3着馬を両方持っていても拾えない配分だった。</li>
+    </ul>
+    <p>方向性（頭は人気馬、ヒモは中穴）自体は間違っていなかった、というのが一番悔しいところだ。問題は戦法ではなく、軸への依存度とカバー範囲の設計だった。次回は軸を1頭に絞って相手を広げるか、2着候補の無印ゾーンまで手を伸ばす組み立てに変えるつもりだ。</p>
+
+    <h2>収支</h2>
+    <div class="balance">
+      <div class="b"><div class="l">投資</div><div class="v">2,000円</div></div>
+      <div class="b"><div class="l">払戻</div><div class="v">0円</div></div>
+      <div class="b neg"><div class="l">収支</div><div class="v">−2,000円</div></div>
+      <div class="b neg"><div class="l">回収率</div><div class="v">0%</div></div>
+    </div>
+    <p>他力本願競馬、第1回は完敗スタート。次回は11月15日のエリザベス女王杯で、同じく100円×20点の勝負を予定している。今度こそ、せめて1点は拾いたい。</p>
   </article>
   <div class="toindex"><a href="/blog/">記事一覧へ</a></div>
   <footer><a href="/">© 2026 TAYOOO</a></footer>
