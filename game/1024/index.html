@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1024 — tayooo</title>
+<meta name="description" content="1024ゲーム by tayooo — タイルをスライドして合体させ、1024を目指すパズル。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23e18c6d'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#857a80 0%,#b06a63 55%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;margin-top:28px;}
+  .score-area{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;justify-content:center;}
+  .score-box{background:var(--paper);border:2.2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);padding:6px 18px;min-width:96px;text-align:center;}
+  .score-label{display:block;font-size:10.5px;font-weight:900;letter-spacing:.18em;color:#A79BA8;}
+  .score-value{font-size:23px;font-weight:900;line-height:1.25;color:var(--ink);}
+  .score-box.best .score-value{color:var(--accent);}
+  .btn{font-family:"Noto Sans JP",sans-serif;font-weight:900;font-size:13.5px;padding:8px 18px;border-radius:999px;border:2.2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .1s,box-shadow .1s;white-space:nowrap;align-self:center;}
+  .btn:hover:not(:disabled){transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+  .btn-accent{background:var(--accent);color:#fff;}
+
+  .grid-outer{position:relative;width:min(100%,470px);margin:18px auto 0;touch-action:none;}
+  .grid-bg{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:10px;padding:10px;background:#EFE3D0;border:2.5px solid var(--ink);border-radius:14px;aspect-ratio:1;}
+  .cell{background:#DFCFB2;border-radius:8px;}
+  .grid-tiles{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:10px;padding:10px;}
+  .tile{display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-weight:900;font-size:clamp(1.5rem,6vw,2.5rem);transition:background-color 80ms ease;user-select:none;-webkit-user-select:none;}
+  @keyframes tile-appear{0%{transform:scale(0);opacity:0;}60%{transform:scale(1.1);}100%{transform:scale(1);opacity:1;}}
+  .tile-new{animation:tile-appear 180ms ease forwards;}
+  @keyframes tile-merge{0%{transform:scale(1);}40%{transform:scale(1.2);}100%{transform:scale(1);}}
+  .tile-merged{animation:tile-merge 150ms ease forwards;}
+  .tile-2{background:#F7E8D8;color:#23233F;}
+  .tile-4{background:#F3D3B3;color:#23233F;}
+  .tile-8{background:#EEB287;color:#23233F;}
+  .tile-16{background:#E88F5F;color:#fff;}
+  .tile-32{background:#DE7355;color:#fff;}
+  .tile-64{background:#C95F5C;color:#fff;}
+  .tile-128{background:#A85A63;color:#fff;}
+  .tile-256{background:#875E5C;color:#fff;}
+  .tile-512{background:#6B4F63;color:#fff;}
+  .tile-1024{background:#D96F45;color:#fff;font-size:clamp(1.05rem,4vw,1.9rem);}
+  .tile-2048{background:#B23A48;color:#fff;box-shadow:0 0 20px rgba(178,58,72,.55);font-size:clamp(1.05rem,4vw,1.9rem);}
+  .tile-super{background:#23233F;color:#E18C6D;font-size:clamp(.85rem,3vw,1.5rem);}
+
+  .overlay{position:absolute;inset:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:20;}
+  .overlay.win{background:rgba(225,140,109,.94);}
+  .overlay.gameover{background:rgba(35,35,63,.9);}
+  .overlay-title{font-size:clamp(1.9rem,8vw,3rem);font-weight:900;color:#fff;letter-spacing:.06em;text-align:center;padding:0 10px;}
+  .overlay-score{color:#fff;font-size:1rem;font-weight:700;opacity:.92;}
+  .overlay-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .overlay .btn{background:rgba(255,255,255,.18);border-color:#fff;color:#fff;box-shadow:none;}
+  .overlay .btn-accent{background:var(--accent);border-color:var(--ink);}
+  .hidden{display:none !important;}
+  .instructions{margin-top:14px;font-size:12.5px;font-weight:500;color:#A79BA8;text-align:center;}
+  @media (max-width:700px){.card{padding:16px 14px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">GAME/1024</div>
+    <a class="back" href="../">← game</a>
+    <h1>1024<span class="dot">.</span></h1>
+    <p>タイルをスライドして合体させ、1024を目指すパズル。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="score-area">
+      <div class="score-box">
+        <span class="score-label">スコア</span>
+        <span class="score-value" id="score-val">0</span>
+      </div>
+      <div class="score-box best">
+        <span class="score-label">ベスト</span>
+        <span class="score-value" id="best-val">0</span>
+      </div>
+      <button class="btn" id="undo-btn" onclick="undo()" disabled>↩ 0</button>
+      <button class="btn btn-accent" onclick="newGame()">ニューゲーム</button>
+    </div>
+
+    <div class="grid-outer" id="board-el">
+      <div class="grid-bg">
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      </div>
+      <div class="grid-tiles" id="tiles-grid"></div>
+      <div class="overlay win hidden" id="win-overlay">
+        <div class="overlay-title">🎉 1024達成！</div>
+        <div class="overlay-score" id="win-score-txt"></div>
+        <div class="overlay-btns">
+          <button class="btn" onclick="continueGame()">つづける</button>
+          <button class="btn btn-accent" onclick="newGame()">ニューゲーム</button>
+        </div>
+      </div>
+      <div class="overlay gameover hidden" id="gameover-overlay">
+        <div class="overlay-title">ゲームオーバー</div>
+        <div class="overlay-score" id="gameover-score-txt"></div>
+        <div class="overlay-btns">
+          <button class="btn btn-accent" onclick="newGame()">ニューゲーム</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="instructions">← ↑ ↓ → キーまたはスワイプで操作</div>
+  </div>
+
+  <footer><a href="../">© 2026 TAYOOO</a></footer>
+</div>
+
+<script>
+  let board, score, bestScore, undoStack, hasWon, gameRunning;
+
+  bestScore = parseInt(localStorage.getItem('1024-best') || '0');
+
+  function newGame() {
+    board = Array.from({length: 4}, () => Array(4).fill(null));
+    score = 0;
+    undoStack = [];
+    hasWon = false;
+    gameRunning = true;
+    hideOverlays();
+    spawnTile();
+    spawnTile();
+    render();
+    updateUI();
+  }
+
+  function cloneBoard(b) {
+    return b.map(row => row.map(c => c ? {...c} : null));
+  }
+
+  function spawnTile() {
+    const empties = [];
+    for (let r = 0; r < 4; r++)
+      for (let c = 0; c < 4; c++)
+        if (!board[r][c]) empties.push([r, c]);
+    if (!empties.length) return;
+    const [r, c] = empties[Math.floor(Math.random() * empties.length)];
+    board[r][c] = { value: Math.random() < 0.9 ? 2 : 4, isNew: true, isMerged: false };
+  }
+
+  function slideRow(cells) {
+    const vals = cells.map(c => c ? c.value : 0).filter(v => v > 0);
+    const result = [];
+    let add = 0;
+    let i = 0;
+    while (i < vals.length) {
+      if (i + 1 < vals.length && vals[i] === vals[i + 1]) {
+        const m = vals[i] * 2;
+        add += m;
+        result.push({ value: m, isNew: false, isMerged: true });
+        i += 2;
+      } else {
+        result.push({ value: vals[i], isNew: false, isMerged: false });
+        i++;
+      }
+    }
+    while (result.length < 4) result.push(null);
+    return { row: result, add };
+  }
+
+  function move(dir) {
+    if (!gameRunning) return;
+
+    const oldBoard = cloneBoard(board);
+    const oldScore = score;
+    const nb = Array.from({length: 4}, () => Array(4).fill(null));
+    let scoreAdd = 0;
+
+    if (dir === 'left') {
+      for (let r = 0; r < 4; r++) {
+        const { row, add } = slideRow(board[r]);
+        nb[r] = row;
+        scoreAdd += add;
+      }
+    } else if (dir === 'right') {
+      for (let r = 0; r < 4; r++) {
+        const { row, add } = slideRow([...board[r]].reverse());
+        nb[r] = row.reverse();
+        scoreAdd += add;
+      }
+    } else if (dir === 'up') {
+      for (let c = 0; c < 4; c++) {
+        const col = board.map(row => row[c]);
+        const { row, add } = slideRow(col);
+        for (let r = 0; r < 4; r++) nb[r][c] = row[r];
+        scoreAdd += add;
+      }
+    } else if (dir === 'down') {
+      for (let c = 0; c < 4; c++) {
+        const col = board.map(row => row[c]).reverse();
+        const { row, add } = slideRow(col);
+        const unrev = row.reverse();
+        for (let r = 0; r < 4; r++) nb[r][c] = unrev[r];
+        scoreAdd += add;
+      }
+    }
+
+    let changed = false;
+    outer: for (let r = 0; r < 4; r++)
+      for (let c = 0; c < 4; c++) {
+        const ov = oldBoard[r][c] ? oldBoard[r][c].value : 0;
+        const nv = nb[r][c] ? nb[r][c].value : 0;
+        if (ov !== nv) { changed = true; break outer; }
+      }
+
+    if (!changed) return;
+
+    if (undoStack.length >= 3) undoStack.shift();
+    undoStack.push({ board: oldBoard, score: oldScore, hadWon: hasWon });
+    board = nb;
+    score += scoreAdd;
+
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('1024-best', bestScore);
+    }
+
+    spawnTile();
+    render();
+    updateUI();
+
+    if (!hasWon) {
+      for (let r = 0; r < 4; r++)
+        for (let c = 0; c < 4; c++)
+          if (board[r][c] && board[r][c].value === 1024) {
+            hasWon = true;
+            gameRunning = false;
+            document.getElementById('win-score-txt').textContent = `Score: ${score}`;
+            document.getElementById('win-overlay').classList.remove('hidden');
+            return;
+          }
+    }
+
+    if (isGameOver()) {
+      gameRunning = false;
+      document.getElementById('gameover-score-txt').textContent = `Score: ${score}`;
+      document.getElementById('gameover-overlay').classList.remove('hidden');
+    }
+  }
+
+  function isGameOver() {
+    for (let r = 0; r < 4; r++)
+      for (let c = 0; c < 4; c++) {
+        if (!board[r][c]) return false;
+        const v = board[r][c].value;
+        if (c < 3 && board[r][c+1] && board[r][c+1].value === v) return false;
+        if (r < 3 && board[r+1][c] && board[r+1][c].value === v) return false;
+      }
+    return true;
+  }
+
+  function undo() {
+    if (!undoStack.length) return;
+    const prev = undoStack.pop();
+    board = prev.board;
+    score = prev.score;
+    hasWon = prev.hadWon;
+    gameRunning = true;
+    hideOverlays();
+    render();
+    updateUI();
+  }
+
+  function continueGame() {
+    gameRunning = true;
+    document.getElementById('win-overlay').classList.add('hidden');
+  }
+
+  function hideOverlays() {
+    document.getElementById('win-overlay').classList.add('hidden');
+    document.getElementById('gameover-overlay').classList.add('hidden');
+  }
+
+  function render() {
+    const grid = document.getElementById('tiles-grid');
+    grid.innerHTML = '';
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        const cell = board[r][c];
+        if (!cell) continue;
+        const tile = document.createElement('div');
+        const valCls = cell.value <= 1024 ? `tile-${cell.value}` : 'tile-super';
+        tile.className = `tile ${valCls}`;
+        if (cell.isNew) tile.classList.add('tile-new');
+        if (cell.isMerged) tile.classList.add('tile-merged');
+        tile.style.gridColumn = c + 1;
+        tile.style.gridRow = r + 1;
+        tile.textContent = cell.value;
+        grid.appendChild(tile);
+      }
+    }
+  }
+
+  function updateUI() {
+    document.getElementById('score-val').textContent = score;
+    document.getElementById('best-val').textContent = bestScore;
+    const left = undoStack.length;
+    document.getElementById('undo-btn').textContent = `↩ ${left}`;
+    document.getElementById('undo-btn').disabled = left === 0;
+  }
+
+  document.addEventListener('keydown', e => {
+    const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+    if (map[e.key]) {
+      e.preventDefault();
+      move(map[e.key]);
+    }
+  });
+
+  const MIN_SWIPE = 30;
+  let touchStartX = 0, touchStartY = 0;
+  const boardEl = document.getElementById('board-el');
+
+  boardEl.addEventListener('touchstart', e => {
+    e.preventDefault();
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: false });
+
+  boardEl.addEventListener('touchmove', e => {
+    e.preventDefault();
+  }, { passive: false });
+
+  boardEl.addEventListener('touchend', e => {
+    e.preventDefault();
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < MIN_SWIPE) return;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      move(dx > 0 ? 'right' : 'left');
+    } else {
+      move(dy > 0 ? 'down' : 'up');
+    }
+  }, { passive: false });
+
+  newGame();
+</script>
+</body>
+</html>
