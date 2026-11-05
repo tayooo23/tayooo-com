@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重み付きルーレット — tayooo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:24px;margin-top:28px;}
+  .winner{border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 16px;text-align:center;}
+  .winner .label{font-size:10.5px;font-weight:900;letter-spacing:.3em;color:#A79BA8;}
+  .winner .name{font-size:30px;font-weight:900;line-height:1.25;word-break:break-all;}
+  .winner .name.idle{font-size:17px;color:#A79BA8;}
+  .winner.hit{background:#FFE9DC;border-color:var(--accent);animation:pop .45s ease;}
+  .winner.hit .name{color:var(--accent);}
+  @keyframes pop{0%{transform:scale(.96);}55%{transform:scale(1.03);}100%{transform:scale(1);}}
+  .wheelbox{position:relative;width:min(380px,86vw);margin:22px auto 6px;}
+  .wheelbox canvas{display:block;width:100%;height:auto;}
+  .pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:26px solid var(--accent);filter:drop-shadow(0 2px 0 rgba(35,35,63,.35));z-index:2;}
+  .controls{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+  .btn{font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:900;border:2.5px solid var(--ink);border-radius:999px;padding:10px 30px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;background:#fff;color:var(--ink);}
+  .btn:hover{transform:translate(1px,1px);box-shadow:3px 3px 0 var(--ink);}
+  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);}
+  .btn.main{background:var(--accent);color:#fff;min-width:170px;}
+  .btn:disabled{opacity:.55;cursor:default;transform:none;}
+
+  .rows{margin-top:26px;display:flex;flex-direction:column;gap:12px;}
+  .row{display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:10px 14px;background:#FFFDF9;flex-wrap:wrap;}
+  .row .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);flex:none;}
+  .row .num{font-family:Consolas,monospace;font-weight:700;font-size:14px;color:#A79BA8;width:16px;text-align:right;flex:none;}
+  .row input.name{flex:1;min-width:130px;font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--ink);border-radius:9px;padding:8px 12px;background:#fff;outline:none;}
+  .row input.name:focus{border-color:var(--accent);}
+  .row .w{display:flex;align-items:center;gap:8px;flex:none;}
+  .row .w .wlabel{font-size:11px;font-weight:900;letter-spacing:.08em;color:#6E6A7E;}
+  .row .w .minmax{font-family:Consolas,monospace;font-size:10.5px;color:#A79BA8;}
+  .row input[type=range]{-webkit-appearance:none;appearance:none;width:130px;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--salmon),var(--sky));border:2px solid var(--ink);outline:none;cursor:pointer;}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
+  .row input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
+  .row .wv{font-family:Consolas,monospace;font-weight:700;font-size:15px;width:20px;text-align:center;}
+  .row .pct{font-family:Consolas,monospace;font-size:12px;color:#A79BA8;width:44px;text-align:right;}
+  .row .del{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);background:#fff;font-size:15px;font-weight:900;line-height:1;cursor:pointer;color:var(--ink);}
+  .row .del:hover{background:#FFE9DC;color:var(--accent);}
+  .rows.single .del{visibility:hidden;}
+  .addbtn{margin-top:14px;width:100%;font-family:"Noto Sans JP",sans-serif;font-size:14px;font-weight:900;color:var(--ink);background:#fff;border:2.5px dashed #CBBFAE;border-radius:12px;padding:12px;cursor:pointer;transition:border-color .12s ease,color .12s ease;}
+  .addbtn:hover{border-color:var(--accent);color:var(--accent);}
+  .note{margin-top:16px;font-size:12px;color:#A79BA8;text-align:center;font-weight:500;}
+  @media (max-width:700px){.card{padding:18px 14px;}.row{gap:8px;}.row input[type=range]{width:104px;}.winner .name{font-size:25px;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">TAYOOO.COM/TOOL/ROULETTE</div>
+    <a class="back" href="/tool/">← tool 一覧</a>
+    <h1>roulette<span class="dot">.</span></h1>
+    <p>重み付きルーレット — 当たりやすさを変えられる抽選ツール。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="winner" id="winner">
+      <div class="label">WINNER</div>
+      <div class="name idle" id="winnerName">スタートで回してみよう</div>
+    </div>
+
+    <div class="wheelbox">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="640" height="640"></canvas>
+    </div>
+
+    <div class="controls">
+      <button class="btn main" id="spinBtn">スタート</button>
+      <button class="btn" id="resetBtn">リセット</button>
+    </div>
+
+    <div class="rows" id="rows"></div>
+    <button class="addbtn" id="addBtn">＋ 項目を追加</button>
+    <p class="note">重みが大きいほど当たりやすくなります（確率は各行の右端に表示）。</p>
+  </div>
+
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+
+<script>
+  const COLORS = ['#e18c6d','#7e8e9e','#857a80','#875e5c','#dfa458','#6d9e8a','#c96f8e','#5d7fa3','#a58bc0','#7fa35d'];
+  const rowsEl = document.getElementById('rows');
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const spinBtn = document.getElementById('spinBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const winnerEl = document.getElementById('winner');
+  const winnerName = document.getElementById('winnerName');
+
+  let entries = [
+    { name: '', weight: 1 },
+    { name: '', weight: 1 }
+  ];
+  let rotation = 0;       // radians
+  let velocity = 0;       // rad/s
+  let mode = 'idle';      // idle | spin | stopping
+  let lastTs = null;
+  let rafId = null;
+
+  function label(i) {
+    const n = entries[i].name.trim();
+    return n ? n : '名前' + (i + 1);
+  }
+  function totalWeight() {
+    return entries.reduce((s, e) => s + e.weight, 0);
+  }
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2, R = W / 2 - 14;
+    ctx.clearRect(0, 0, W, H);
+    const total = totalWeight();
+    let a = rotation - Math.PI / 2;
+    entries.forEach((e, i) => {
+      const arc = (e.weight / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, R, a, a + arc);
+      ctx.closePath();
+      ctx.fillStyle = COLORS[i % COLORS.length];
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#FAF5EE';
+      ctx.stroke();
+      // label
+      const mid = a + arc / 2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(mid);
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 30px "Noto Sans JP", sans-serif';
+      let t = label(i);
+      const maxW = R * 0.58;
+      while (t.length > 1 && ctx.measureText(t).width > maxW) t = t.slice(0, -1);
+      if (t !== label(i)) t += '…';
+      if (Math.cos(mid) < 0) {
+        ctx.rotate(Math.PI);
+        ctx.textAlign = 'left';
+        ctx.fillText(t, -(R - 26), 0);
+      } else {
+        ctx.textAlign = 'right';
+        ctx.fillText(t, R - 26, 0);
+      }
+      ctx.restore();
+      a += arc;
+    });
+    // outer ring + hub
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#23233F';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 44, 0, Math.PI * 2);
+    ctx.fillStyle = '#FAF5EE';
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#23233F';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#C9502E';
+    ctx.fill();
+  }
+
+  function refreshRows() {
+    rowsEl.classList.toggle('single', entries.length <= 1);
+    const total = totalWeight();
+    [...rowsEl.children].forEach((row, i) => {
+      row.querySelector('.num').textContent = i + 1;
+      row.querySelector('.dot').style.background = COLORS[i % COLORS.length];
+      row.querySelector('.pct').textContent = Math.round(entries[i].weight / total * 100) + '%';
+    });
+  }
+
+  function addRow(i) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML =
+      '<span class="dot"></span>' +
+      '<span class="num"></span>' +
+      '<input class="name" type="text" maxlength="20" placeholder="名前を入力">' +
+      '<div class="w"><span class="wlabel">重み</span>' +
+      '<span class="minmax">1</span>' +
+      '<input type="range" min="1" max="10" step="1">' +
+      '<span class="minmax">10</span>' +
+      '<span class="wv"></span><span class="pct"></span></div>' +
+      '<button class="del" aria-label="削除">×</button>';
+    const nameInput = row.querySelector('.name');
+    const range = row.querySelector('input[type=range]');
+    nameInput.value = entries[i].name;
+    nameInput.placeholder = '名前' + (i + 1);
+    range.value = entries[i].weight;
+    row.querySelector('.wv').textContent = entries[i].weight;
+    nameInput.addEventListener('input', () => {
+      const idx = [...rowsEl.children].indexOf(row);
+      entries[idx].name = nameInput.value;
+      draw();
+    });
+    range.addEventListener('input', () => {
+      const idx = [...rowsEl.children].indexOf(row);
+      entries[idx].weight = parseInt(range.value, 10);
+      row.querySelector('.wv').textContent = range.value;
+      refreshRows();
+      draw();
+    });
+    row.querySelector('.del').addEventListener('click', () => {
+      const idx = [...rowsEl.children].indexOf(row);
+      if (entries.length <= 1) return;
+      entries.splice(idx, 1);
+      row.remove();
+      [...rowsEl.children].forEach((r, j) => {
+        r.querySelector('.name').placeholder = '名前' + (j + 1);
+      });
+      refreshRows();
+      draw();
+    });
+    rowsEl.appendChild(row);
+  }
+
+  function setWinner(text) {
+    if (text) {
+      winnerName.textContent = text;
+      winnerName.classList.remove('idle');
+      winnerEl.classList.remove('hit');
+      void winnerEl.offsetWidth;
+      winnerEl.classList.add('hit');
+    } else {
+      winnerName.textContent = 'スタートで回してみよう';
+      winnerName.classList.add('idle');
+      winnerEl.classList.remove('hit');
+    }
+  }
+
+  function pickWinner() {
+    const total = totalWeight();
+    let p = ((-rotation) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+    let acc = 0;
+    for (let i = 0; i < entries.length; i++) {
+      acc += (entries[i].weight / total) * Math.PI * 2;
+      if (p < acc) return label(i);
+    }
+    return label(entries.length - 1);
+  }
+
+  function loop(ts) {
+    if (lastTs == null) lastTs = ts;
+    const dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+    if (mode === 'spin' || mode === 'stopping') {
+      rotation += velocity * dt;
+      if (mode === 'stopping') {
+        velocity *= Math.pow(0.30, dt);
+        if (velocity < 0.12) {
+          velocity = 0;
+          mode = 'idle';
+          spinBtn.textContent = 'スタート';
+          spinBtn.disabled = false;
+          setWinner(pickWinner());
+          draw();
+          rafId = null;
+          return;
+        }
+      }
+      draw();
+      rafId = requestAnimationFrame(loop);
+    }
+  }
+
+  spinBtn.addEventListener('click', () => {
+    if (mode === 'idle') {
+      setWinner(null);
+      winnerName.textContent = '回転中…';
+      winnerName.classList.add('idle');
+      velocity = 9 + Math.random() * 4;
+      mode = 'spin';
+      spinBtn.textContent = 'ストップ';
+      lastTs = null;
+      rafId = requestAnimationFrame(loop);
+    } else if (mode === 'spin') {
+      mode = 'stopping';
+      spinBtn.textContent = 'とまる…';
+      spinBtn.disabled = true;
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    mode = 'idle';
+    velocity = 0;
+    rotation = 0;
+    spinBtn.textContent = 'スタート';
+    spinBtn.disabled = false;
+    setWinner(null);
+    draw();
+  });
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    entries.push({ name: '', weight: 1 });
+    addRow(entries.length - 1);
+    [...rowsEl.children].forEach((r, j) => {
+      r.querySelector('.name').placeholder = '名前' + (j + 1);
+    });
+    refreshRows();
+    draw();
+    const inputs = rowsEl.querySelectorAll('.name');
+    inputs[inputs.length - 1].focus();
+  });
+
+  entries.forEach((_, i) => addRow(i));
+  refreshRows();
+  draw();
+</script>
+</body>
+</html>
