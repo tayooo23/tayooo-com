@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チンチロ — tayooo</title>
+<meta name="description" content="チンチロ — スマホを振って遊べる3Dサイコロゲーム。親と勝負！">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23e18c6d'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#857a80 0%,#b06a63 55%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;margin-top:28px;}
+  .scorebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;}
+  .points{font-weight:900;font-size:14px;background:var(--paper);border:2.2px solid var(--ink);border-radius:999px;padding:6px 16px;box-shadow:3px 3px 0 var(--ink);}
+  .points b{font-size:19px;letter-spacing:.04em;color:var(--accent);margin-left:5px;}
+  .betlabel{font-size:11.5px;font-weight:900;color:#A79BA8;letter-spacing:.14em;}
+  .chip{font-family:"Noto Sans JP",sans-serif;font-weight:900;font-size:13px;cursor:pointer;border:2.2px solid var(--ink);border-radius:999px;padding:6px 15px;background:#fff;color:var(--ink);box-shadow:2px 2px 0 var(--ink);transition:transform .1s,box-shadow .1s;}
+  .chip.on{background:var(--accent);color:#fff;}
+  .chip:disabled{opacity:.45;cursor:default;}
+  .chip:not(:disabled):hover{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink);}
+
+  .stage{position:relative;width:100%;margin-top:18px;border-radius:14px;overflow:hidden;border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);background:#37333F;aspect-ratio:1/0.84;}
+  .stage canvas{display:block;width:100%;height:100%;}
+  .banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(250,245,238,.96);border:2.5px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 rgba(35,35,63,.85);padding:8px 20px;text-align:center;min-width:210px;pointer-events:none;z-index:2;}
+  .banner .b-main{font-size:21px;font-weight:900;line-height:1.25;}
+  .banner .b-sub{font-size:12px;font-weight:700;color:#857A80;}
+  .banner.win .b-main{color:var(--accent);}
+  .banner.lose .b-main{color:#4a5a75;}
+
+  .hands{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+  .hand{background:#FFFDF9;border:2px solid #E4DCCF;border-radius:12px;padding:10px 14px;}
+  .hand .who{font-size:11px;font-weight:900;letter-spacing:.12em;color:#A79BA8;}
+  .hand.turn{border-color:var(--ink);box-shadow:3px 3px 0 var(--ink);}
+  .hand .dice{font-size:23px;font-weight:900;letter-spacing:.14em;line-height:1.3;}
+  .hand .yaku{font-size:14.5px;font-weight:900;min-height:21px;}
+  .hand .yaku small{font-size:11px;color:#A79BA8;font-weight:700;}
+
+  .controls{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+  .btn{font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:900;border:2.5px solid var(--ink);border-radius:999px;padding:11px 28px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;background:#fff;color:var(--ink);}
+  .btn:hover{transform:translate(1px,1px);box-shadow:3px 3px 0 var(--ink);}
+  .btn.main{background:var(--accent);color:#fff;font-size:16.5px;padding:12px 34px;}
+  .btn:disabled{opacity:.55;cursor:default;transform:none;}
+  .btn.gyro.on{background:#BFE3C8;}
+  .hint{margin-top:12px;font-size:12px;color:#A79BA8;text-align:center;font-weight:500;min-height:16px;}
+
+  .logcard{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:16px 20px;margin-top:20px;font-size:12.5px;line-height:1.8;color:#5A5468;min-height:78px;}
+  details.rules{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:16px 20px;margin-top:20px;font-size:12.5px;line-height:1.8;color:#5A5468;}
+  details.rules summary{font-weight:900;color:var(--ink);cursor:pointer;font-size:13.5px;}
+  details.rules table{border-collapse:collapse;margin-top:6px;}
+  details.rules td{padding:1px 10px 1px 0;}
+  @media (max-width:700px){.card{padding:16px 14px;}.banner .b-main{font-size:18px;}.btn.main{padding:12px 24px;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">GAME/CHINCHIRO</div>
+    <a class="back" href="../">← game</a>
+    <h1>chinchiro<span class="dot">.</span></h1>
+    <p>スマホを振って振る、3Dサイコロ勝負。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <div class="scorebar">
+      <div class="points">POINTS<b id="pointsVal">1000</b></div>
+      <span class="betlabel">BET</span>
+      <button class="chip" data-bet="50">50</button>
+      <button class="chip on" data-bet="100">100</button>
+      <button class="chip" data-bet="200">200</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="banner" id="banner">
+        <div class="b-main" id="bannerMain">チンチロ</div>
+        <div class="b-sub" id="bannerSub">親に勝てば賭け金ゲット。振ってみよう。</div>
+      </div>
+    </div>
+
+    <div class="hands">
+      <div class="hand turn" id="playerHand">
+        <div class="who">あなた（子）</div>
+        <div class="dice" id="playerDice">-・-・-</div>
+        <div class="yaku" id="playerYaku">まだ振っていない</div>
+      </div>
+      <div class="hand" id="dealerHand">
+        <div class="who">親（CPU）</div>
+        <div class="dice" id="dealerDice">-・-・-</div>
+        <div class="yaku" id="dealerYaku">あなたの後で振る</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn main" id="rollBtn">🎲 サイコロを振る</button>
+      <button class="btn gyro" id="gyroBtn">📱 ジャイロ：OFF</button>
+    </div>
+    <div class="hint" id="gyroStatus">ジャイロをONにすると、スマホを振ってサイコロを振れます（端末を傾けると視点も動きます）</div>
+  </div>
+
+  <div class="logcard" id="log"></div>
+
+  <details class="rules">
+    <summary>役とルール</summary>
+    <p>サイコロ3個を振って役を作ります。役なし（目なし）は最大3回まで振り直しOK。親より強い役で勝ち、役が強いほど配当アップ。</p>
+    <table>
+      <tr><td><b>ピンゾロ</b>（1・1・1）</td><td>最強・配当5倍</td></tr>
+      <tr><td><b>ゾロ目</b>（3つ同じ）</td><td>配当3倍。数字が大きいほど強い</td></tr>
+      <tr><td><b>シゴロ</b>（4・5・6）</td><td>配当2倍</td></tr>
+      <tr><td><b>目</b>（ペア＋1つ）</td><td>余りの数字が点数。配当1倍</td></tr>
+      <tr><td><b>目なし</b></td><td>3回振って役なしだと目なし負け</td></tr>
+      <tr><td><b>ヒフミ</b>（1・2・3）</td><td>最弱・出たら即負け。負けた側がヒフミだと勝者は配当2倍</td></tr>
+    </table>
+  </details>
+
+  <footer><a href="../">© 2026 TAYOOO</a></footer>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "./lib/three.module.min.js",
+  "three/addons/": "./lib/addons/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ================= 3D scene ================= */
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x37333f);
+
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+const CAM_BASE = new THREE.Vector3(0, 6.9, 7.6);
+const CAM_LOOK = new THREE.Vector3(0, 0.5, 0);
+camera.position.copy(CAM_BASE);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const key = new THREE.DirectionalLight(0xfff1de, 2.4);
+key.position.set(5, 10, 4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -6; key.shadow.camera.right = 6;
+key.shadow.camera.top = 6; key.shadow.camera.bottom = -6;
+key.shadow.camera.far = 30;
+key.shadow.bias = -0.0004;
+key.shadow.radius = 4;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xdfe9ff, 0.55);
+fill.position.set(-6, 5, -4);
+scene.add(fill);
+scene.add(new THREE.HemisphereLight(0xfff4e0, 0x37333f, 0.35));
+
+/* table（地面）— サイトのパレットに寄せた木目 */
+function tableTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 1024;
+  const g = c.getContext('2d');
+  g.fillStyle = '#8a6552'; g.fillRect(0, 0, 1024, 1024);
+  for (let i = 0; i < 8; i++) {
+    g.fillStyle = i % 2 ? 'rgba(35,35,63,0.07)' : 'rgba(255,243,226,0.05)';
+    g.fillRect(0, i * 128, 1024, 128);
+    g.fillStyle = 'rgba(35,35,63,0.38)'; g.fillRect(0, i * 128, 1024, 3);
+  }
+  for (let i = 0; i < 2600; i++) {
+    g.fillStyle = `rgba(60,38,26,${Math.random() * 0.09})`;
+    g.fillRect(Math.random() * 1024, Math.random() * 1024, 30 + Math.random() * 90, 1.4);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+const table = new THREE.Mesh(
+  new THREE.CircleGeometry(16, 48),
+  new THREE.MeshStandardMaterial({ map: tableTexture(), roughness: 0.92, metalness: 0 })
+);
+table.rotation.x = -Math.PI / 2;
+table.receiveShadow = true;
+scene.add(table);
+
+/* tray + bowl（器）— 空色を深めた陶器＋サーモンの縁 */
+const tray = new THREE.Mesh(
+  new THREE.CylinderGeometry(3.02, 3.16, 0.16, 72),
+  new THREE.MeshPhysicalMaterial({ color: 0x875e5c, roughness: 0.38, clearcoat: 0.7, clearcoatRoughness: 0.3, envMapIntensity: 0.5 })
+);
+tray.position.y = 0.08;
+tray.castShadow = true; tray.receiveShadow = true;
+scene.add(tray);
+
+const bowlProfile = [
+  [0.0, 0.03], [0.95, 0.03], [1.18, 0.10], [1.95, 0.52], [2.45, 1.22],
+  [2.62, 1.72], [2.58, 1.86], [2.36, 1.81], [2.00, 1.16], [1.50, 0.67], [0.9, 0.57], [0.0, 0.55]
+].map(p => new THREE.Vector2(p[0], p[1]));
+const bowl = new THREE.Mesh(
+  new THREE.LatheGeometry(bowlProfile, 96),
+  new THREE.MeshPhysicalMaterial({ color: 0x4e6377, roughness: 0.22, clearcoat: 1.0, clearcoatRoughness: 0.22, envMapIntensity: 0.75, side: THREE.DoubleSide })
+);
+bowl.position.y = 0.16;
+bowl.castShadow = true; bowl.receiveShadow = true;
+scene.add(bowl);
+const rim = new THREE.Mesh(
+  new THREE.TorusGeometry(2.60, 0.045, 16, 96),
+  new THREE.MeshPhysicalMaterial({ color: 0xe18c6d, roughness: 0.3, metalness: 0.35, envMapIntensity: 0.9 })
+);
+rim.rotation.x = Math.PI / 2;
+rim.position.y = 0.16 + 1.79;
+scene.add(rim);
+
+/* dice */
+function pipTexture(value) {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, 256, 256);
+  const P = { l: 58, c: 128, r: 198 };
+  const spots = {
+    1: [[P.c, P.c]], 2: [[P.l, P.l], [P.r, P.r]], 3: [[P.l, P.l], [P.c, P.c], [P.r, P.r]],
+    4: [[P.l, P.l], [P.r, P.l], [P.l, P.r], [P.r, P.r]],
+    5: [[P.l, P.l], [P.r, P.l], [P.c, P.c], [P.l, P.r], [P.r, P.r]],
+    6: [[P.l, P.l], [P.r, P.l], [P.l, P.c], [P.r, P.c], [P.l, P.r], [P.r, P.r]]
+  }[value];
+  for (const [x, y] of spots) {
+    const r = value === 1 ? 52 : 30;
+    const grad = g.createRadialGradient(x - 6, y - 6, 2, x, y, r);
+    if (value === 1) { grad.addColorStop(0, '#d4572e'); grad.addColorStop(1, '#b03c1f'); }
+    else { grad.addColorStop(0, '#3d3d55'); grad.addColorStop(1, '#1d1d2e'); }
+    g.fillStyle = grad;
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+const DIE = 0.92, DIE_Y = 1.17;
+const FACE_EULER = {
+  1: [0, 0, 0], 6: [Math.PI, 0, 0], 2: [-Math.PI / 2, 0, 0],
+  5: [Math.PI / 2, 0, 0], 3: [0, 0, Math.PI / 2], 4: [0, 0, -Math.PI / 2]
+};
+function makeDie() {
+  const group = new THREE.Group();
+  const core = new THREE.Mesh(
+    new RoundedBoxGeometry(DIE, DIE, DIE, 4, 0.115),
+    new THREE.MeshPhysicalMaterial({ color: 0xfdfcf8, roughness: 0.16, clearcoat: 0.55, clearcoatRoughness: 0.3, envMapIntensity: 0.5 })
+  );
+  core.castShadow = true; core.receiveShadow = true;
+  group.add(core);
+  const faceMat = v => new THREE.MeshPhysicalMaterial({ map: pipTexture(v), transparent: true, roughness: 0.16, clearcoat: 0.55, clearcoatRoughness: 0.3, envMapIntensity: 0.5, polygonOffset: true, polygonOffsetFactor: -1 });
+  const off = DIE / 2 + 0.002, size = 0.70;
+  const defs = [
+    { v: 1, pos: [0, off, 0], rot: [-Math.PI / 2, 0, 0] },
+    { v: 6, pos: [0, -off, 0], rot: [Math.PI / 2, 0, 0] },
+    { v: 2, pos: [0, 0, off], rot: [0, 0, 0] },
+    { v: 5, pos: [0, 0, -off], rot: [0, Math.PI, 0] },
+    { v: 3, pos: [off, 0, 0], rot: [0, Math.PI / 2, 0] },
+    { v: 4, pos: [-off, 0, 0], rot: [0, -Math.PI / 2, 0] }
+  ];
+  for (const d of defs) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(size, size), faceMat(d.v));
+    p.position.set(...d.pos); p.rotation.set(...d.rot);
+    group.add(p);
+  }
+  group.position.set(0, DIE_Y, 0);
+  scene.add(group);
+  return group;
+}
+const dice = [makeDie(), makeDie(), makeDie()];
+const REST_SPOTS = [
+  new THREE.Vector3(-0.72, DIE_Y, 0.42),
+  new THREE.Vector3(0.74, DIE_Y, 0.38),
+  new THREE.Vector3(0.02, DIE_Y, -0.68)
+];
+dice.forEach((d, i) => d.position.copy(REST_SPOTS[i]));
+
+/* roll animation */
+let rollAnim = null;
+function targetQuat(value) {
+  const e = FACE_EULER[value];
+  const base = new THREE.Quaternion().setFromEuler(new THREE.Euler(e[0], e[1], e[2]));
+  const yaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (Math.random() * 4 | 0) * Math.PI / 2);
+  return yaw.multiply(base);
+}
+function animateRoll(values, done) {
+  const dur = 1250;
+  const spots = [...REST_SPOTS];
+  for (let i = spots.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [spots[i], spots[j]] = [spots[j], spots[i]]; }
+  const items = dice.map((d, i) => {
+    const spot = spots[i].clone();
+    spot.x += (Math.random() - 0.5) * 0.2; spot.z += (Math.random() - 0.5) * 0.2;
+    return {
+      mesh: d,
+      fromP: new THREE.Vector3((Math.random() - 0.5) * 0.5, DIE_Y + 2.6 + Math.random() * 0.5, (Math.random() - 0.5) * 0.5),
+      toP: spot,
+      fromQ: new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3)),
+      toQ: targetQuat(values[i]),
+      delay: i * 90
+    };
+  });
+  items.forEach(it => { it.mesh.position.copy(it.fromP); it.mesh.quaternion.copy(it.fromQ); });
+  rollAnim = { start: performance.now(), dur, items, done };
+  [420, 760, 1080].forEach((ms, i) => setTimeout(() => click(0.5 - i * 0.13), ms));
+  setTimeout(() => thud(), 1210);
+}
+const easeOut = t => 1 - Math.pow(1 - t, 4);
+function stepRoll(now) {
+  if (!rollAnim) return;
+  let allDone = true;
+  for (const it of rollAnim.items) {
+    const t = THREE.MathUtils.clamp((now - rollAnim.start - it.delay) / rollAnim.dur, 0, 1);
+    if (t < 1) allDone = false;
+    const e = easeOut(t);
+    it.mesh.position.x = THREE.MathUtils.lerp(it.fromP.x, it.toP.x, e);
+    it.mesh.position.z = THREE.MathUtils.lerp(it.fromP.z, it.toP.z, e);
+    it.mesh.position.y = it.toP.y + (it.fromP.y - it.toP.y) * Math.pow(1 - t, 2) + Math.abs(Math.sin(t * Math.PI * 3)) * 0.8 * Math.pow(1 - t, 1.6);
+    it.mesh.quaternion.slerpQuaternions(it.fromQ, it.toQ, e);
+  }
+  if (allDone) { const d = rollAnim.done; rollAnim = null; d && d(); }
+}
+
+/* camera sway / gyro parallax */
+let tiltX = 0, tiltY = 0, curTX = 0, curTY = 0;
+function renderLoop(now) {
+  requestAnimationFrame(renderLoop);
+  stepRoll(now);
+  curTX += (tiltX - curTX) * 0.04; curTY += (tiltY - curTY) * 0.04;
+  const sway = gyroOn ? 0 : Math.sin(now * 0.0004) * 0.12;
+  camera.position.set(CAM_BASE.x + curTY * 2.2 + sway, CAM_BASE.y - curTX * 1.2, CAM_BASE.z);
+  camera.lookAt(CAM_LOOK);
+  renderer.render(scene, camera);
+}
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+requestAnimationFrame(renderLoop);
+
+/* ================= sound ================= */
+let AC = null;
+function audio() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; }
+function noiseBurst(dur, freq, gain, type = 'bandpass') {
+  try {
+    const ac = audio(), len = ac.sampleRate * dur, buf = ac.createBuffer(1, len, ac.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = ac.createBufferSource(); src.buffer = buf;
+    const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+    const g = ac.createGain(); g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(ac.destination); src.start();
+  } catch (e) { /* no sound */ }
+}
+function click(v = 0.4) { noiseBurst(0.035, 2100, v); }
+function thud() { noiseBurst(0.09, 260, 0.5, 'lowpass'); }
+function tone(f1, f2) {
+  try {
+    const ac = audio(), o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f1, ac.currentTime);
+    o.frequency.setValueAtTime(f2, ac.currentTime + 0.12);
+    g.gain.setValueAtTime(0.12, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + 0.32);
+  } catch (e) { /* no sound */ }
+}
+
+/* ================= game logic ================= */
+const $ = id => document.getElementById(id);
+const els = {
+  points: $('pointsVal'), banner: $('banner'), bannerMain: $('bannerMain'), bannerSub: $('bannerSub'),
+  pDice: $('playerDice'), pYaku: $('playerYaku'), dDice: $('dealerDice'), dYaku: $('dealerYaku'),
+  pHand: $('playerHand'), dHand: $('dealerHand'), roll: $('rollBtn'), log: $('log'),
+  gyroBtn: $('gyroBtn'), gyroStatus: $('gyroStatus')
+};
+let points = 1000;
+try { const s = localStorage.getItem('chinchiro-points'); if (s !== null) points = Math.max(0, parseInt(s, 10) || 0); } catch (e) {}
+let bet = 100;
+let phase = 'player';
+let attempts = 3;
+let playerHand = null, dealerHand = null;
+let dealerAttempts = 3;
+let rolling = false;
+
+function savePoints() { try { localStorage.setItem('chinchiro-points', String(points)); } catch (e) {} }
+function showPoints() { els.points.textContent = points.toLocaleString(); }
+function setBanner(main, sub, cls = '') {
+  els.bannerMain.textContent = main; els.bannerSub.textContent = sub;
+  els.banner.className = 'banner ' + cls;
+}
+function logLine(html) {
+  const div = document.createElement('div'); div.innerHTML = html;
+  els.log.prepend(div);
+  while (els.log.children.length > 5) els.log.lastChild.remove();
+}
+function evaluate(v) {
+  const s = [...v].sort((a, b) => a - b);
+  if (s[0] === 1 && s[1] === 1 && s[2] === 1) return { name: 'ピンゾロ', rank: 100, mult: 5, s };
+  if (s[0] === s[1] && s[1] === s[2]) return { name: s[0] + 'のゾロ目', rank: 80 + s[0], mult: 3, s };
+  if (s.join() === '4,5,6') return { name: 'シゴロ', rank: 70, mult: 2, s };
+  if (s.join() === '1,2,3') return { name: 'ヒフミ', rank: -2, mult: 1, s };
+  if (s[0] === s[1]) return { name: s[2] + 'の目', rank: s[2], mult: 1, s };
+  if (s[1] === s[2]) return { name: s[0] + 'の目', rank: s[0], mult: 1, s };
+  return { name: '目なし', rank: -1, mult: 1, s, none: true };
+}
+function rollValues() { return [0, 0, 0].map(() => 1 + Math.random() * 6 | 0); }
+function diceText(v) { return v.join('・'); }
+
+function updateRollBtn() {
+  if (rolling) { els.roll.disabled = true; els.roll.textContent = '🎲 回転中…'; return; }
+  if (phase === 'player') {
+    els.roll.disabled = points < bet;
+    els.roll.textContent = attempts === 3 ? '🎲 サイコロを振る' : `🎲 もう一度振る（残り${attempts}回）`;
+  } else if (phase === 'done') {
+    els.roll.disabled = false;
+    els.roll.textContent = points < 50 ? '🔄 リセットして次の勝負へ' : '▶ 次の勝負へ';
+  } else {
+    els.roll.disabled = true; els.roll.textContent = '親の番…';
+  }
+}
+function setTurn() {
+  els.pHand.classList.toggle('turn', phase === 'player');
+  els.dHand.classList.toggle('turn', phase === 'dealer');
+}
+function doRoll() {
+  if (rolling || phase !== 'player' || points < bet) return;
+  rolling = true; updateRollBtn();
+  const v = rollValues();
+  animateRoll(v, () => {
+    rolling = false;
+    const h = evaluate(v);
+    els.pDice.textContent = diceText(v);
+    attempts--;
+    if (h.none && attempts > 0) {
+      els.pYaku.innerHTML = `目なし <small>あと${attempts}回振れる</small>`;
+      setBanner('目なし', '役なし。もう一度振ろう。');
+      logLine(`あなた： ${diceText(v)} → <b>目なし</b>`);
+    } else {
+      playerHand = h;
+      els.pYaku.textContent = h.name;
+      logLine(`あなた： ${diceText(v)} → <b>${h.name}</b>`);
+      phase = 'dealer'; setTurn();
+      setBanner('あなたの役： ' + h.name, '親の番です。');
+      setTimeout(dealerRoll, 950);
+    }
+    updateRollBtn();
+  });
+}
+function dealerRoll() {
+  if (rolling) return;
+  rolling = true; updateRollBtn();
+  const v = rollValues();
+  animateRoll(v, () => {
+    rolling = false;
+    const h = evaluate(v);
+    els.dDice.textContent = diceText(v);
+    dealerAttempts--;
+    if (h.none && dealerAttempts > 0) {
+      els.dYaku.innerHTML = `目なし <small>あと${dealerAttempts}回</small>`;
+      logLine(`親： ${diceText(v)} → <b>目なし</b>`);
+      updateRollBtn();
+      setTimeout(dealerRoll, 850);
+    } else {
+      dealerHand = h;
+      els.dYaku.textContent = h.name;
+      logLine(`親： ${diceText(v)} → <b>${h.name}</b>`);
+      judge();
+    }
+    updateRollBtn();
+  });
+}
+function judge() {
+  phase = 'done'; setTurn();
+  const p = playerHand, d = dealerHand;
+  if (p.rank === d.rank) {
+    setBanner('引き分け', `${p.name} vs ${d.name} — 賭け金はそのまま`);
+    logLine(`結果： <b>引き分け</b>（${p.name} vs ${d.name}）`);
+    tone(520, 520);
+  } else if (p.rank > d.rank) {
+    let mult = p.mult;
+    if (d.rank === -2) mult = Math.max(mult, 2);
+    const gain = bet * mult;
+    points += gain;
+    setBanner('勝ち！ +' + gain.toLocaleString(), `${p.name} vs ${d.name}${mult > 1 ? '（配当' + mult + '倍）' : ''}`, 'win');
+    logLine(`結果： <b>あなたの勝ち +${gain.toLocaleString()}</b>（${p.name} vs ${d.name}）`);
+    tone(660, 990);
+  } else {
+    let mult = d.mult;
+    if (p.rank === -2) mult = Math.max(mult, 2);
+    const loss = bet * mult;
+    points -= loss;
+    setBanner('負け… -' + loss.toLocaleString(), `${p.name} vs ${d.name}${mult > 1 ? '（配当' + mult + '倍）' : ''}`, 'lose');
+    logLine(`結果： <b>親の勝ち -${loss.toLocaleString()}</b>（${p.name} vs ${d.name}）`);
+    tone(240, 150);
+  }
+  showPoints(); savePoints();
+  updateRollBtn();
+  if (points < 50) {
+    els.bannerSub.textContent = 'ポイント不足 — リセットして1000から再開できます';
+  }
+}
+function nextRound() {
+  if (points < 50) { points = 1000; showPoints(); savePoints(); logLine('<b>ポイントを1000にリセット</b>'); }
+  attempts = 3; dealerAttempts = 3;
+  playerHand = null; dealerHand = null;
+  phase = 'player'; setTurn();
+  els.pDice.textContent = '-・-・-'; els.dDice.textContent = '-・-・-';
+  els.pYaku.textContent = 'まだ振っていない'; els.dYaku.textContent = 'あなたの後で振る';
+  setBanner('チンチロ', '親に勝てば賭け金ゲット。振ってみよう。');
+  updateRollBtn();
+}
+els.roll.addEventListener('click', () => {
+  audio();
+  if (phase === 'done') nextRound();
+  else doRoll();
+});
+stage.addEventListener('click', () => { if (phase === 'player' && !rolling) { audio(); doRoll(); } });
+document.querySelectorAll('.chip').forEach(ch => {
+  ch.addEventListener('click', () => {
+    if (phase === 'dealer' || rolling) return;
+    bet = parseInt(ch.dataset.bet, 10);
+    document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === ch));
+    updateRollBtn();
+  });
+});
+
+/* ================= gyro ================= */
+let gyroOn = false;
+let lastMag = null, lastShakeAt = 0;
+els.gyroBtn.addEventListener('click', async () => {
+  if (gyroOn) return;
+  try {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      const res = await DeviceMotionEvent.requestPermission();
+      if (res !== 'granted') { els.gyroStatus.textContent = 'ジャイロの許可が得られませんでした。ボタンで遊んでください。'; return; }
+    }
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      await DeviceOrientationEvent.requestPermission().catch(() => {});
+    }
+    window.addEventListener('devicemotion', onMotion);
+    window.addEventListener('deviceorientation', onOrient);
+    gyroOn = true;
+    els.gyroBtn.textContent = '📱 ジャイロ：ON';
+    els.gyroBtn.classList.add('on');
+    els.gyroStatus.textContent = 'ジャイロON：スマホをシャッと振るとサイコロが振れます。傾けると視点も動きます。';
+  } catch (e) {
+    els.gyroStatus.textContent = 'この端末ではジャイロが使えませんでした。ボタンで遊んでください。';
+  }
+});
+function onMotion(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a || a.x === null) return;
+  const mag = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+  const now = performance.now();
+  if (lastMag !== null && Math.abs(mag - lastMag) > 15 && now - lastShakeAt > 1000) {
+    lastShakeAt = now;
+    if (phase === 'player' && !rolling) { audio(); doRoll(); }
+  }
+  lastMag = mag;
+}
+function onOrient(e) {
+  if (e.gamma === null) return;
+  tiltY = THREE.MathUtils.clamp(e.gamma, -28, 28) / 28 * 0.6;
+  tiltX = THREE.MathUtils.clamp((e.beta || 45) - 45, -28, 28) / 28 * 0.45;
+}
+
+showPoints();
+updateRollBtn();
+setTurn();
+logLine('ようこそ。BETを選んで「サイコロを振る」から開始。スマホを振ってもOK（ジャイロON時）。');
+</script>
+</body>
+</html>
