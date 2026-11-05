@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自分用ツールをサブドメインで公開してみた話 — tayooo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23875e5c'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:56px;font-weight:900;line-height:1.02;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:70px;}
+  .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#fff;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;white-space:nowrap;}
+  .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:38px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:48px;}}
+
+  .backlink{display:inline-block;margin-top:26px;font-size:12.5px;font-weight:700;color:#8A7F8C;}
+  .backlink:hover{color:#C9502E;}
+  article{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:34px 40px 30px;margin-top:14px;}
+  .meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .meta .date{font-family:Consolas,monospace;font-size:12.5px;color:#A79BA8;}
+  article h1{font-size:27px;font-weight:900;line-height:1.45;margin-bottom:22px;}
+  article p{font-size:14.5px;font-weight:500;line-height:1.95;margin-bottom:16px;color:#33334D;}
+  .toindex{margin-top:22px;text-align:center;}
+  .toindex a{font-size:12.5px;font-weight:900;border:2px solid var(--ink);border-radius:999px;padding:6px 18px;background:#fff;display:inline-block;}
+  .toindex a:hover{background:#F3E7DA;}
+  @media (max-width:700px){article{padding:22px 18px;}article h1{font-size:21px;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <a class="backlink" href="/blog/">← blog 一覧</a>
+  <article>
+    <div class="meta"><span class="tag r">Tools</span><span class="date">2025-04-22</span></div>
+    <h1>自分用ツールをサブドメインで公開してみた話</h1>
+    <p>自分用に作った小さなツールを、tools.tayooo.com というサブドメインに置いて公開してみた。最初はIPアドレスを確認するだけの、ごく単純なページだ。</p>
+    <p>わざわざサブドメインを切ったのは、メインのサイトと役割を分け たかったから。ブログは読む場所、ツールは使う場所。URLを見るだけで何の場所か分かる、というのが気に入っている。</p>
+    <p>公開してみると、自分しか使わないつもりのものでも「誰かに見られる」前提で作るようになる。雑に作れない分、結果として自分のためにもなる。この感覚は続けていきたい。</p>
+  </article>
+  <div class="toindex"><a href="/blog/">記事一覧へ</a></div>
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+</body>
+</html>
