@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPアドレス計算 — tayooo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:24px;margin-top:28px;}
+  .card h2{font-size:12px;font-weight:900;letter-spacing:.3em;color:#A79BA8;margin-bottom:18px;}
+  @media (max-width:700px){.card{padding:18px 14px;}}
+
+  .field{margin-bottom:20px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:12px;font-weight:900;letter-spacing:.14em;color:#6E6A7E;margin-bottom:8px;}
+  .mono{font-family:Consolas,"Courier New",monospace;}
+  input[type=text]{width:100%;font-family:Consolas,"Courier New",monospace;font-size:19px;font-weight:700;color:var(--ink);border:2.5px solid var(--ink);border-radius:10px;padding:11px 14px;background:#FFFDF9;outline:none;letter-spacing:.03em;}
+  input[type=text]:focus{border-color:var(--accent);}
+  input[type=text]::placeholder{color:#C4BBAE;font-weight:500;}
+  input[type=text].bad{border-color:var(--accent);background:#FFF1E8;}
+  .err{display:none;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--accent);}
+  .err.on{display:block;}
+
+  .prefixrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .prefixbig{font-family:Consolas,monospace;font-size:34px;font-weight:700;line-height:1;min-width:86px;}
+  .prefixbig small{font-size:15px;color:#A79BA8;}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 220px;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--salmon),var(--sky));border:2px solid var(--ink);outline:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .chip{font-family:Consolas,monospace;font-size:13px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:4px 14px;background:#fff;cursor:pointer;box-shadow:2.5px 2.5px 0 var(--ink);transition:transform .08s ease,box-shadow .08s ease;}
+  .chip:hover{transform:translate(1px,1px);box-shadow:1.5px 1.5px 0 var(--ink);}
+  .chip.on{background:var(--accent);color:#fff;}
+  .maskline{margin-top:12px;font-size:13.5px;color:#6E6A7E;}
+  .maskline input{display:inline-block;width:190px;font-size:15px;padding:6px 10px;margin-left:8px;}
+
+  .result-main{border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);padding:14px 18px;text-align:center;margin-bottom:6px;}
+  .result-main .label{font-size:10.5px;font-weight:900;letter-spacing:.3em;color:#A79BA8;}
+  .result-main .value{font-family:Consolas,monospace;font-size:27px;font-weight:700;margin-top:4px;word-break:break-all;}
+  .result-main .value .pfx{color:var(--accent);}
+  @media (max-width:700px){.result-main .value{font-size:20px;}}
+
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:2px dashed #E4DCCF;}
+  .rrow:last-child{border-bottom:none;}
+  .rrow .k{flex:0 0 168px;font-size:13px;font-weight:900;color:#6E6A7E;letter-spacing:.04em;}
+  .rrow .v{flex:1;font-family:Consolas,monospace;font-size:16.5px;font-weight:700;word-break:break-all;}
+  .rrow .v small{font-size:12.5px;color:#A79BA8;font-weight:700;}
+  .copy{flex:none;font-family:"Noto Sans JP",sans-serif;font-size:11px;font-weight:900;border:2px solid var(--ink);border-radius:999px;padding:3px 12px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 var(--ink);}
+  .copy:hover{background:#FFE9DC;}
+  .copy.done{background:var(--accent);color:#fff;}
+  @media (max-width:700px){.rrow .k{flex-basis:118px;font-size:12px;}.rrow .v{font-size:14.5px;}}
+
+  .binbox{background:var(--ink);border-radius:12px;padding:18px;overflow-x:auto;}
+  .binrow{display:flex;align-items:baseline;gap:14px;white-space:nowrap;margin-bottom:10px;}
+  .binrow:last-child{margin-bottom:0;}
+  .binrow .bl{flex:0 0 52px;font-size:10.5px;font-weight:900;letter-spacing:.22em;color:#A79BA8;}
+  .bin{font-family:Consolas,monospace;font-size:16.5px;font-weight:700;letter-spacing:.14em;color:#FFF3E2;}
+  .bin .net{color:#FFB59A;}
+  .bin .host{color:#B9CCE0;}
+  .bin .dotsep{color:#6E6A7E;}
+  .bin.maskbits{color:#8E8CA3;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px;font-weight:700;color:#6E6A7E;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;border:1.5px solid var(--ink);}
+  .note{margin-top:14px;font-size:12.5px;color:#A79BA8;font-weight:500;line-height:1.7;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">TOOL/IP-CALC</div>
+    <a class="back" href="/tool/">← tool 一覧</a>
+    <h1>ip calc<span class="dot">.</span></h1>
+    <p>IPアドレスとサブネットから、ネットワークの情報を計算する。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h2>INPUT — 入力</h2>
+    <div class="field">
+      <label for="ipInput">IPアドレス（IPv4）</label>
+      <input type="text" id="ipInput" value="" placeholder="192.168.0.0" inputmode="decimal" autocomplete="off" spellcheck="false">
+      <div class="err" id="ipErr">IPアドレスの形式が正しくありません（例：192.168.1.10）</div>
+    </div>
+    <div class="field">
+      <label>プレフィックス長</label>
+      <div class="prefixrow">
+        <div class="prefixbig"><small>/</small><span id="prefixNum">24</span></div>
+        <input type="range" id="prefixRange" min="0" max="32" step="1" value="24">
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="maskline">サブネットマスク<input type="text" id="maskInput" value="255.255.255.0" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
+      <div class="err" id="maskErr">マスクの形式が正しくありません（1の後に0が続く形のみ）</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>RESULT — 計算結果</h2>
+    <div class="result-main">
+      <div class="label">NETWORK</div>
+      <div class="value"><span id="rNetwork">192.168.1.0</span><span class="pfx" id="rCidr">/24</span></div>
+    </div>
+    <div id="rows"></div>
+    <p class="note" id="specialNote"></p>
+  </div>
+
+  <div class="card">
+    <h2>BINARY — 2進数表示</h2>
+    <div class="binbox">
+      <div class="binrow"><div class="bl">IP</div><div class="bin" id="binIp"></div></div>
+      <div class="binrow"><div class="bl">MASK</div><div class="bin maskbits" id="binMask"></div></div>
+      <div class="binrow"><div class="bl">NET</div><div class="bin" id="binNet"></div></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:#FFB59A"></i>ネットワーク部</span>
+      <span><i style="background:#B9CCE0"></i>ホスト部</span>
+    </div>
+    <p class="note">IPアドレスの情報：<span class="mono" id="ipInfo"></span></p>
+  </div>
+
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+
+<script>
+  const ipInput = document.getElementById('ipInput');
+  const maskInput = document.getElementById('maskInput');
+  const ipErr = document.getElementById('ipErr');
+  const maskErr = document.getElementById('maskErr');
+  const prefixRange = document.getElementById('prefixRange');
+  const prefixNum = document.getElementById('prefixNum');
+  const chipsEl = document.getElementById('chips');
+  const rowsEl = document.getElementById('rows');
+  let prefix = 24;
+
+  const CHIP_PRESETS = [8, 16, 24, 32];
+  CHIP_PRESETS.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.textContent = '/' + p; b.dataset.p = p;
+    b.addEventListener('click', () => setPrefix(p, 'chip'));
+    chipsEl.appendChild(b);
+  });
+
+  function parseIp(str) {
+    const parts = String(str).trim().split('.');
+    if (parts.length !== 4) return null;
+    let n = 0;
+    for (const part of parts) {
+      if (!/^\d{1,3}$/.test(part)) return null;
+      const v = Number(part);
+      if (v > 255) return null;
+      n = n * 256 + v;
+    }
+    return n >>> 0;
+  }
+  function toIp(n) {
+    return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+  }
+  function maskFromPrefix(p) {
+    return p === 0 ? 0 : (0xFFFFFFFF << (32 - p)) >>> 0;
+  }
+  function prefixFromMask(m) {
+    const inv = (~m) >>> 0;
+    if ((inv & (inv + 1)) !== 0) return null; // 1の後に0が続いていない
+    let p = 0, x = m;
+    while (x) { p += x & 1; x >>>= 1; }
+    return p;
+  }
+  function classify(ip) {
+    const a = (ip >>> 24) & 255, b = (ip >>> 16) & 255;
+    let cls = a < 128 ? 'A' : a < 192 ? 'B' : a < 224 ? 'C' : a < 240 ? 'D（マルチキャスト）' : 'E（実験用）';
+    let kind = 'グローバル';
+    if (a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)) kind = 'プライベート（RFC 1918）';
+    else if (a === 127) kind = 'ループバック';
+    else if (a === 169 && b === 254) kind = 'リンクローカル（APIPA）';
+    else if (a === 100 && b >= 64 && b <= 127) kind = 'CGNAT（RFC 6598）';
+    else if (a === 0) kind = '予約（this network）';
+    return 'クラス ' + cls + ' ／ ' + kind;
+  }
+  function fmt(n) { return n.toLocaleString('ja-JP'); }
+
+  function setPrefix(p, from) {
+    prefix = Math.max(0, Math.min(32, p | 0));
+    prefixNum.textContent = prefix;
+    prefixRange.value = prefix;
+    if (from !== 'mask') maskInput.value = toIp(maskFromPrefix(prefix));
+    maskErr.classList.remove('on'); maskInput.classList.remove('bad');
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', Number(c.dataset.p) === prefix));
+    render();
+  }
+
+  function binHtml(n, splitAt) {
+    const bits = n.toString(2).padStart(32, '0');
+    let out = '';
+    for (let i = 0; i < 32; i++) {
+      if (i > 0 && i % 8 === 0) out += '<span class="dotsep">.</span>';
+      if (splitAt == null) out += bits[i];
+      else out += '<span class="' + (i < splitAt ? 'net' : 'host') + '">' + bits[i] + '</span>';
+    }
+    return out;
+  }
+  function binPlain(n) {
+    const bits = n.toString(2).padStart(32, '0');
+    return bits.replace(/(.{8})(?=.)/g, '$1<span class="dotsep">.</span>');
+  }
+
+  const ROW_DEFS = [
+    ['broadcast', 'ブロードキャスト'],
+    ['mask', 'サブネットマスク'],
+    ['wildcard', 'ワイルドカードマスク'],
+    ['first', 'ホスト範囲（最初）'],
+    ['last', 'ホスト範囲（最後）'],
+    ['usable', '使用可能なホスト数'],
+    ['total', '総アドレス数'],
+  ];
+  ROW_DEFS.forEach(([key, label]) => {
+    const row = document.createElement('div');
+    row.className = 'rrow';
+    row.innerHTML = '<div class="k">' + label + '</div><div class="v" id="v_' + key + '">—</div>' +
+      '<button class="copy" data-k="' + key + '">コピー</button>';
+    rowsEl.appendChild(row);
+  });
+  rowsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.copy');
+    if (!btn) return;
+    const v = document.getElementById('v_' + btn.dataset.k);
+    const text = v ? v.dataset.raw : '';
+    if (!text) return;
+    const done = () => { btn.textContent = '✓'; btn.classList.add('done'); setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('done'); }, 1100); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(done);
+    else done();
+  });
+
+  function setVal(key, display, raw) {
+    const el = document.getElementById('v_' + key);
+    el.innerHTML = display;
+    el.dataset.raw = raw || '';
+  }
+
+  function render() {
+    if (ipInput.value.trim() === '') {
+      ipErr.classList.remove('on'); ipInput.classList.remove('bad');
+      document.getElementById('rNetwork').textContent = '—';
+      document.getElementById('rCidr').textContent = '';
+      ['broadcast', 'mask', 'wildcard', 'first', 'last', 'usable', 'total'].forEach(k => setVal(k, '—', ''));
+      document.getElementById('specialNote').textContent = '';
+      document.getElementById('binIp').textContent = '—';
+      document.getElementById('binMask').textContent = '—';
+      document.getElementById('binNet').textContent = '—';
+      document.getElementById('ipInfo').textContent = 'IPアドレスを入力すると表示されます';
+      return;
+    }
+    const ip = parseIp(ipInput.value);
+    const ok = ip !== null;
+    ipErr.classList.toggle('on', !ok);
+    ipInput.classList.toggle('bad', !ok);
+    if (!ok) return;
+    const mask = maskFromPrefix(prefix);
+    const network = (ip & mask) >>> 0;
+    const broadcast = (network | (~mask >>> 0)) >>> 0;
+    const total = Math.pow(2, 32 - prefix);
+    let first, last, usable, note = '';
+    if (prefix <= 30) { first = network + 1; last = broadcast - 1; usable = total - 2; }
+    else if (prefix === 31) { first = network; last = broadcast; usable = 2; note = '※ /31 はポイントツーポイントリンク用に、両アドレスとも使用可能として計算しています（RFC 3021）。'; }
+    else { first = network; last = network; usable = 1; note = '※ /32 はホストルート（そのIPアドレス1つだけ）です。'; }
+
+    document.getElementById('rNetwork').textContent = toIp(network);
+    document.getElementById('rCidr').textContent = '/' + prefix;
+    setVal('broadcast', toIp(broadcast), toIp(broadcast));
+    setVal('mask', toIp(mask) + ' <small>(/' + prefix + ')</small>', toIp(mask));
+    setVal('wildcard', toIp((~mask) >>> 0), toIp((~mask) >>> 0));
+    setVal('first', toIp(first), toIp(first));
+    setVal('last', toIp(last), toIp(last));
+    setVal('usable', fmt(usable), String(usable));
+    setVal('total', fmt(total), String(total));
+    document.getElementById('specialNote').textContent = note;
+
+    document.getElementById('binIp').innerHTML = binHtml(ip, prefix);
+    document.getElementById('binMask').innerHTML = binPlain(mask);
+    document.getElementById('binNet').innerHTML = binHtml(network, prefix);
+    document.getElementById('ipInfo').textContent = classify(ip) + ' ／ 16進数 0x' + ip.toString(16).toUpperCase().padStart(8, '0');
+  }
+
+  ipInput.addEventListener('input', render);
+  prefixRange.addEventListener('input', () => setPrefix(Number(prefixRange.value), 'range'));
+  maskInput.addEventListener('change', () => {
+    const m = parseIp(maskInput.value);
+    const p = m === null ? null : prefixFromMask(m);
+    if (p === null) { maskErr.classList.add('on'); maskInput.classList.add('bad'); return; }
+    setPrefix(p, 'mask');
+  });
+  setPrefix(24, 'init');
+</script>
+<script src="/season.js" defer></script>
+</body>
+</html>
