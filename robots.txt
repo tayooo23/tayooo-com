@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://tayooo.com/sitemap.xml
+# Web Analytics enabled 2026-11-06
