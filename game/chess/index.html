@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チェス — tayooo</title>
+<meta name="description" content="CPU対戦（4段階）も2人プレイもできるチェス。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Crect x='28' y='28' width='22' height='22' fill='%23F0D9B5'/%3E%3Crect x='50' y='28' width='22' height='22' fill='%23B58863'/%3E%3Crect x='28' y='50' width='22' height='22' fill='%23B58863'/%3E%3Crect x='50' y='50' width='22' height='22' fill='%23F0D9B5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;position:relative;z-index:1;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:24px;margin-top:28px;}
+  .btn{font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:900;border:2.5px solid var(--ink);border-radius:999px;padding:10px 30px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;background:#fff;color:var(--ink);}
+  .btn:hover{transform:translate(1px,1px);box-shadow:3px 3px 0 var(--ink);}
+  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);}
+  .btn.main{background:var(--accent);color:#fff;min-width:190px;}
+  .btn.small{font-size:12.5px;padding:7px 16px;box-shadow:3px 3px 0 var(--ink);}
+
+  /* 設定画面 */
+  .group{margin-top:22px;}
+  .group:first-of-type{margin-top:6px;}
+  .glabel{font-size:11px;font-weight:900;letter-spacing:.28em;color:#A79BA8;margin-bottom:9px;}
+  .seg{display:flex;gap:9px;flex-wrap:wrap;}
+  .seg button{flex:1 1 0;min-width:96px;font-family:"Noto Sans JP",sans-serif;font-size:14.5px;font-weight:900;border:2.5px solid var(--ink);border-radius:12px;padding:11px 6px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease,background .1s ease;}
+  .seg button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink);}
+  .seg button.on{background:var(--accent);border-color:var(--ink);color:#fff;}
+  .seg button .sub{display:block;font-size:10.5px;font-weight:700;opacity:.75;margin-top:2px;}
+  .group.off{opacity:.38;pointer-events:none;filter:grayscale(.4);}
+  .guide-row{display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:13px 15px;background:#FFFDF9;cursor:pointer;}
+  .guide-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer;flex:none;}
+  .guide-row .gt{font-size:14.5px;font-weight:900;}
+  .guide-row .gd{font-size:11.5px;color:#A79BA8;font-weight:500;}
+  .start-wrap{margin-top:30px;text-align:center;}
+  .note{margin-top:16px;font-size:12px;color:#A79BA8;text-align:center;font-weight:500;}
+
+  /* 対戦画面 */
+  .game-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .status{font-size:16px;font-weight:900;min-height:24px;}
+  .status .turn-disc{display:inline-block;width:15px;height:15px;border-radius:50%;border:2px solid var(--ink);vertical-align:-2px;margin-right:6px;}
+  .scorebar{display:flex;gap:10px;margin-top:14px;}
+  .score{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid #E4DCCF;border-radius:12px;padding:9px 6px;background:#FFFDF9;font-weight:900;font-size:15px;}
+  .score.active{border-color:var(--accent);background:#FFE9DC;}
+  .score .pchip{width:19px;height:19px;border-radius:5px;border:2px solid var(--ink);flex:none;}
+  .pchip.w{background:#fff;}
+  .pchip.b{background:var(--ink);}
+  .score .adv{font-family:Consolas,monospace;font-size:13px;color:var(--accent);min-width:34px;text-align:left;}
+  .captured{display:flex;align-items:center;flex-wrap:wrap;gap:1px;min-height:27px;margin:10px auto 0;width:min(560px,100%);padding:0 2px;}
+  .captured.btm{margin:6px auto 0;}
+  .captured .piece{font-size:20px;}
+  .board-frame{margin:8px auto 4px;width:min(560px,100%);background:var(--brown);border:2.5px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:10px;}
+  .board{display:grid;grid-template-columns:repeat(8,1fr);border:2px solid var(--ink);border-radius:6px;overflow:hidden;}
+  .sq{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:default;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}
+  .sq.light{background:#F0D9B5;}
+  .sq.dark{background:#B58863;}
+  .sq.clickable{cursor:pointer;}
+  .sq.lastmove{box-shadow:inset 0 0 0 100px rgba(225,140,109,.38);}
+  .sq.sel{box-shadow:inset 0 0 0 100px rgba(201,80,46,.32),inset 0 0 0 3.5px var(--accent);}
+  .sq.incheck{box-shadow:inset 0 0 0 100px rgba(216,43,32,.48);}
+  .sq .piece{pointer-events:none;line-height:1;font-size:clamp(23px,6.4vw,42px);}
+  .piece.w{color:#FFFDF6;text-shadow:1px 0 0 var(--ink),-1px 0 0 var(--ink),0 1px 0 var(--ink),0 -1px 0 var(--ink),1px 1px 0 var(--ink),-1px 1px 0 var(--ink),1px -1px 0 var(--ink),-1px -1px 0 var(--ink),0 2px 3px rgba(35,35,63,.45);}
+  .piece.b{color:#2B2320;text-shadow:1px 0 0 rgba(255,246,236,.55),-1px 0 0 rgba(255,246,236,.55),0 1px 0 rgba(255,246,236,.55),0 -1px 0 rgba(255,246,236,.55),0 2px 3px rgba(35,35,63,.35);}
+  .board.f2p .sq .piece.b{display:inline-block;transform:rotate(180deg);}
+  .sq .dot{position:absolute;inset:7%;border:3.5px solid rgba(35,35,63,.42);border-radius:7px;background:rgba(255,246,220,.28);pointer-events:none;}
+  .sq .ring{position:absolute;inset:4%;border:4px solid rgba(201,80,46,.62);border-radius:7px;pointer-events:none;}
+  .msg{min-height:22px;text-align:center;font-size:13.5px;font-weight:700;color:#6E6A7E;margin-top:12px;}
+
+  /* モーダル */
+  .overlay{position:fixed;inset:0;background:rgba(35,35,63,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:7px 7px 0 var(--ink);padding:26px 24px;max-width:380px;width:100%;text-align:center;animation:pop .3s ease;}
+  @keyframes pop{0%{transform:scale(.94);}60%{transform:scale(1.02);}100%{transform:scale(1);}}
+  .modal h2{font-size:21px;font-weight:900;}
+  .modal p{margin-top:10px;font-size:13.5px;color:#6E6A7E;font-weight:500;line-height:1.6;}
+  .modal .mbtns{display:flex;gap:11px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+  .modal .final-score{font-size:17px;font-weight:900;margin-top:12px;}
+  .promo-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+  .promo-btns button{width:64px;height:64px;font-size:40px;line-height:1;border:2.5px solid var(--ink);border-radius:12px;background:#FFFDF9;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;}
+  .promo-btns button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink);background:#FFE9DC;}
+  [hidden]{display:none !important;}
+  @media (max-width:700px){.card{padding:18px 14px;}.seg button{min-width:70px;font-size:13.5px;}.status{font-size:14.5px;}.board-frame{padding:7px;}}
+  .farbar{transform:rotate(180deg);margin-bottom:16px;}
+  .farbar .game-top{margin-bottom:10px;}
+  .farbar .msg{margin-top:8px;}
+  .captured.flip{transform:rotate(180deg);}
+  .game-top .status{min-width:0;}
+  .game-top .btn{flex:none;white-space:nowrap;}
+  #nearBar{margin-top:14px;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">GAME/CHESS</div>
+    <a class="back" href="/game/">← game 一覧</a>
+    <h1>chess<span class="dot">.</span></h1>
+    <p>王を詰ませる、世界の定番。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <!-- 設定画面 -->
+  <div class="card" id="screenSettings">
+    <div class="group">
+      <div class="glabel">対戦相手</div>
+      <div class="seg" id="segMode">
+        <button data-v="cpu" class="on">1人でプレイ<span class="sub">CPU対戦</span></button>
+        <button data-v="2p">2人でプレイ<span class="sub">対面で交互に</span></button>
+      </div>
+    </div>
+    <div class="group" id="groupLevel">
+      <div class="glabel">難易度</div>
+      <div class="seg" id="segLevel">
+        <button data-v="0">初級</button>
+        <button data-v="1" class="on">中級</button>
+        <button data-v="2">上級</button>
+        <button data-v="3">鬼</button>
+      </div>
+    </div>
+    <div class="group" id="groupOrder">
+      <div class="glabel">順番</div>
+      <div class="seg" id="segOrder">
+        <button data-v="first" class="on">先攻<span class="sub">白</span></button>
+        <button data-v="second">後攻<span class="sub">黒</span></button>
+        <button data-v="random">ランダム</button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="glabel">ガイド</div>
+      <label class="guide-row">
+        <input type="checkbox" id="chkGuide" checked>
+        <span><span class="gt">ガイドを表示する</span><br><span class="gd">動けるマスと、取れる駒を表示します</span></span>
+      </label>
+    </div>
+    <div class="start-wrap">
+      <button class="btn main" id="btnStart">スタート</button>
+    </div>
+    <p class="note">2人でプレイのときは、難易度と順番は使いません。</p>
+  </div>
+
+  <!-- 対戦画面 -->
+  <div class="card" id="screenGame" hidden>
+    <div class="farbar" id="farBar" hidden>
+      <div class="game-top">
+        <div class="status" id="statusFar"></div>
+        <button class="btn small" id="btnToTitleFar">タイトルへ戻る</button>
+      </div>
+      <div class="score" id="scoreFar"><span class="pchip b"></span><span>プレイヤー2・黒</span><span class="adv" id="advFar"></span></div>
+      <p class="msg" id="msgFar"></p>
+    </div>
+    <div class="game-top" id="gameTop">
+      <div class="status" id="status"></div>
+      <button class="btn small" id="btnToTitle">タイトルへ戻る</button>
+    </div>
+    <div class="scorebar" id="scoreBar">
+      <div class="score" id="scoreW"><span class="pchip w"></span><span id="nameW">白</span><span class="adv" id="advW"></span></div>
+      <div class="score" id="scoreB"><span class="pchip b"></span><span id="nameB">黒</span><span class="adv" id="advB"></span></div>
+    </div>
+    <div class="captured" id="capTop"></div>
+    <div class="board-frame"><div class="board" id="board"></div></div>
+    <div class="captured btm" id="capBottom"></div>
+    <div id="nearBar" hidden>
+      <div class="game-top">
+        <div class="status" id="statusNear"></div>
+        <button class="btn small" id="btnToTitleNear">タイトルへ戻る</button>
+      </div>
+      <div class="score" id="scoreNear" style="margin-top:10px;"><span class="pchip w"></span><span>プレイヤー1・白</span><span class="adv" id="advNear"></span></div>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+
+<!-- 確認モーダル -->
+<div class="overlay" id="overlayConfirm">
+  <div class="modal">
+    <h2>タイトルに戻りますか？</h2>
+    <p>対戦中の内容は破棄されます。</p>
+    <div class="mbtns">
+      <button class="btn" id="btnCancelBack">やめる</button>
+      <button class="btn main" id="btnDoBack" style="min-width:120px;">戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- 昇級モーダル -->
+<div class="overlay" id="overlayPromo">
+  <div class="modal">
+    <h2>何に昇級しますか？</h2>
+    <p>ポーンの昇級先を選んでください。</p>
+    <div class="promo-btns" id="promoBtns"></div>
+    <div class="mbtns">
+      <button class="btn" id="btnPromoCancel">やめる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 結果モーダル -->
+<div class="overlay" id="overlayResult">
+  <div class="modal">
+    <h2 id="resultTitle">結果</h2>
+    <div class="final-score" id="resultScore"></div>
+    <p id="resultText"></p>
+    <div class="mbtns">
+      <button class="btn" id="btnAgain">もう一度</button>
+      <button class="btn main" id="btnResultTitle" style="min-width:120px;">タイトルへ戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- 設定 ----------
+  const settings = { mode: 'cpu', level: 1, order: 'first', guide: true };
+  function bindSeg(id, key, cb) {
+    const el = document.getElementById(id);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      settings[key] = key === 'level' ? Number(b.dataset.v) : b.dataset.v;
+      if (cb) cb();
+    });
+  }
+  bindSeg('segMode', 'mode', () => {
+    const cpu = settings.mode === 'cpu';
+    document.getElementById('groupLevel').classList.toggle('off', !cpu);
+    document.getElementById('groupOrder').classList.toggle('off', !cpu);
+  });
+  bindSeg('segLevel', 'level');
+  bindSeg('segOrder', 'order');
+  document.getElementById('chkGuide').addEventListener('change', e => { settings.guide = e.target.checked; });
+
+  // ---------- チェス本体 ----------
+  // 盤: index = rank*8 + file（rank0 = 1段目 / file0 = a筋）。白駒は大文字、黒駒は小文字。
+  const GLYPH = { K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙', k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟' };
+  const VAL = { P:100, N:320, B:330, R:500, Q:900, K:0 };
+  const KNIGHT_D = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+  const KING_D = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  const DIAG_D = [[-1,-1],[-1,1],[1,-1],[1,1]];
+  const LINE_D = [[-1,0],[1,0],[0,-1],[0,1]];
+  const inB = (r, f) => r >= 0 && r < 8 && f >= 0 && f < 8;
+  const isW = p => p && p === p.toUpperCase();
+  const colorOf = p => isW(p) ? 'w' : 'b';
+  const opp = c => c === 'w' ? 'b' : 'w';
+
+  function initialState() {
+    const b = new Array(64).fill(null);
+    const backW = ['R','N','B','Q','K','B','N','R'], backB = ['r','n','b','q','k','b','n','r'];
+    for (let f = 0; f < 8; f++) {
+      b[f] = backW[f]; b[8 + f] = 'P';
+      b[48 + f] = 'p'; b[56 + f] = backB[f];
+    }
+    return { b, turn: 'w', cast: { K: true, Q: true, k: true, q: true }, ep: -1, half: 0 };
+  }
+  function attacked(bd, sq, byW) {
+    const r = sq >> 3, f = sq & 7;
+    const pr = byW ? r - 1 : r + 1; // 攻撃するポーンは標的の1段手前にいる
+    if (pr >= 0 && pr < 8) for (const df of [-1, 1]) {
+      const pf = f + df;
+      if (pf >= 0 && pf < 8 && bd[pr * 8 + pf] === (byW ? 'P' : 'p')) return true;
+    }
+    for (const [dr, df] of KNIGHT_D) {
+      const rr = r + dr, cc = f + df;
+      if (inB(rr, cc) && bd[rr * 8 + cc] === (byW ? 'N' : 'n')) return true;
+    }
+    for (const [dr, df] of KING_D) {
+      const rr = r + dr, cc = f + df;
+      if (inB(rr, cc) && bd[rr * 8 + cc] === (byW ? 'K' : 'k')) return true;
+    }
+    for (const [dirs, types] of [[DIAG_D, 'BQ'], [LINE_D, 'RQ']]) {
+      for (const [dr, df] of dirs) {
+        let rr = r + dr, cc = f + df;
+        while (inB(rr, cc)) {
+          const p = bd[rr * 8 + cc];
+          if (p) { if (isW(p) === byW && types.includes(p.toUpperCase())) return true; break; }
+          rr += dr; cc += df;
+        }
+      }
+    }
+    return false;
+  }
+  function kingSq(bd, color) {
+    const k = color === 'w' ? 'K' : 'k';
+    for (let i = 0; i < 64; i++) if (bd[i] === k) return i;
+    return -1;
+  }
+  function inCheck(st, color) { return attacked(st.b, kingSq(st.b, color), color === 'b'); }
+
+  function pseudoMoves(st) {
+    const bd = st.b, turn = st.turn, w = turn === 'w', ms = [];
+    const push = (from, to, extra) => ms.push(Object.assign({ from, to }, extra || {}));
+    for (let i = 0; i < 64; i++) {
+      const p = bd[i]; if (!p || isW(p) !== w) continue;
+      const r = i >> 3, f = i & 7, t = p.toUpperCase();
+      if (t === 'P') {
+        const dir = w ? 8 : -8, startRank = w ? 1 : 6, promoRank = w ? 7 : 0;
+        const one = i + dir;
+        if (!bd[one]) {
+          if ((one >> 3) === promoRank) { for (const pr of ['Q','R','B','N']) push(i, one, { promo: pr }); }
+          else {
+            push(i, one);
+            const two = i + dir * 2;
+            if (r === startRank && !bd[two]) push(i, two, { dbl: true });
+          }
+        }
+        for (const df of [-1, 1]) {
+          const nf = f + df; if (nf < 0 || nf > 7) continue;
+          const to = i + dir + df, tp = bd[to];
+          if (tp && isW(tp) !== w) {
+            if ((to >> 3) === promoRank) { for (const pr of ['Q','R','B','N']) push(i, to, { promo: pr }); }
+            else push(i, to);
+          } else if (!tp && to === st.ep) push(i, to, { epCap: true });
+        }
+      } else if (t === 'N' || t === 'K') {
+        for (const [dr, df] of (t === 'N' ? KNIGHT_D : KING_D)) {
+          const rr = r + dr, cc = f + df; if (!inB(rr, cc)) continue;
+          const tp = bd[rr * 8 + cc];
+          if (!tp || isW(tp) !== w) push(i, rr * 8 + cc);
+        }
+        if (t === 'K') { // キャスリング（権利・空きマス・通過マスの被攻撃をすべて確認）
+          const home = w ? 4 : 60, byW = !w;
+          const rights = w ? ['K','Q'] : ['k','q'];
+          if (i === home && st.cast[rights[0]] && bd[home + 3] === (w ? 'R' : 'r') &&
+              !bd[home + 1] && !bd[home + 2] &&
+              !attacked(bd, home, byW) && !attacked(bd, home + 1, byW) && !attacked(bd, home + 2, byW))
+            push(i, home + 2, { castle: 'K' });
+          if (i === home && st.cast[rights[1]] && bd[home - 4] === (w ? 'R' : 'r') &&
+              !bd[home - 1] && !bd[home - 2] && !bd[home - 3] &&
+              !attacked(bd, home, byW) && !attacked(bd, home - 1, byW) && !attacked(bd, home - 2, byW))
+            push(i, home - 2, { castle: 'Q' });
+        }
+      } else {
+        const dirs = t === 'B' ? DIAG_D : t === 'R' ? LINE_D : KING_D;
+        for (const [dr, df] of dirs) {
+          let rr = r + dr, cc = f + df;
+          while (inB(rr, cc)) {
+            const tp = bd[rr * 8 + cc];
+            if (!tp) push(i, rr * 8 + cc);
+            else { if (isW(tp) !== w) push(i, rr * 8 + cc); break; }
+            rr += dr; cc += df;
+          }
+        }
+      }
+    }
+    return ms;
+  }
+  function applyMove(st, m) {
+    const bd = st.b.slice();
+    const cast = Object.assign({}, st.cast);
+    const piece = bd[m.from], w = isW(piece);
+    const captured = m.epCap ? bd[m.to + (w ? -8 : 8)] : bd[m.to];
+    bd[m.from] = null;
+    if (m.epCap) bd[m.to + (w ? -8 : 8)] = null;
+    bd[m.to] = m.promo ? (w ? m.promo : m.promo.toLowerCase()) : piece;
+    if (m.castle === 'K') { bd[m.to - 1] = bd[m.to + 1]; bd[m.to + 1] = null; }
+    if (m.castle === 'Q') { bd[m.to + 1] = bd[m.to - 2]; bd[m.to - 2] = null; }
+    if (piece === 'K') { cast.K = false; cast.Q = false; }
+    if (piece === 'k') { cast.k = false; cast.q = false; }
+    if (m.from === 0 || m.to === 0) cast.Q = false;
+    if (m.from === 7 || m.to === 7) cast.K = false;
+    if (m.from === 56 || m.to === 56) cast.q = false;
+    if (m.from === 63 || m.to === 63) cast.k = false;
+    return {
+      b: bd, turn: opp(st.turn), cast,
+      ep: m.dbl ? (m.from + m.to) / 2 : -1,
+      half: (piece.toUpperCase() === 'P' || captured) ? 0 : st.half + 1
+    };
+  }
+  function legalMoves(st) {
+    const res = [];
+    for (const m of pseudoMoves(st)) {
+      const ns = applyMove(st, m);
+      if (!attacked(ns.b, kingSq(ns.b, st.turn), st.turn === 'b')) res.push(m);
+    }
+    return res;
+  }
+  function insufficientMaterial(bd) {
+    const minors = [];
+    for (let i = 0; i < 64; i++) {
+      const p = bd[i]; if (!p) continue;
+      const t = p.toUpperCase();
+      if (t === 'P' || t === 'R' || t === 'Q') return false;
+      if (t === 'B' || t === 'N') minors.push({ t, sqColor: ((i >> 3) + (i & 7)) % 2 });
+    }
+    if (minors.length <= 1) return true;
+    if (minors.every(m => m.t === 'B') && minors.every(m => m.sqColor === minors[0].sqColor)) return true;
+    return false;
+  }
+
+  // ---------- CPU ----------
+  const PST = {
+    P: [0,0,0,0,0,0,0,0, 50,50,50,50,50,50,50,50, 10,10,20,30,30,20,10,10, 5,5,10,25,25,10,5,5, 0,0,0,20,20,0,0,0, 5,-5,-10,0,0,-10,-5,5, 5,10,10,-20,-20,10,10,5, 0,0,0,0,0,0,0,0],
+    N: [-50,-40,-30,-30,-30,-30,-40,-50, -40,-20,0,0,0,0,-20,-40, -30,0,10,15,15,10,0,-30, -30,5,15,20,20,15,5,-30, -30,0,15,20,20,15,0,-30, -30,5,10,15,15,10,5,-30, -40,-20,0,5,5,0,-20,-40, -50,-40,-30,-30,-30,-30,-40,-50],
+    B: [-20,-10,-10,-10,-10,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,10,10,5,0,-10, -10,5,5,10,10,5,5,-10, -10,0,10,10,10,10,0,-10, -10,10,10,10,10,10,10,-10, -10,5,0,0,0,0,5,-10, -20,-10,-10,-10,-10,-10,-10,-20],
+    R: [0,0,0,0,0,0,0,0, 5,10,10,10,10,10,10,5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, 0,0,0,5,5,0,0,0],
+    Q: [-20,-10,-10,-5,-5,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,5,5,5,0,-10, -5,0,5,5,5,5,0,-5, 0,0,5,5,5,5,0,-5, -10,5,5,5,5,5,0,-10, -10,0,5,0,0,0,0,-10, -20,-10,-10,-5,-5,-10,-10,-20],
+    K: [-30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -20,-30,-30,-40,-40,-30,-30,-20, -10,-20,-20,-20,-20,-20,-20,-10, 20,20,0,0,0,0,20,20, 20,30,10,0,0,10,30,20]
+  };
+  function evaluate(st) { // 白から見た評価
+    let s = 0;
+    for (let i = 0; i < 64; i++) {
+      const p = st.b[i]; if (!p) continue;
+      const t = p.toUpperCase(), w = isW(p), r = i >> 3, f = i & 7;
+      const v = VAL[t] + PST[t][w ? (7 - r) * 8 + f : r * 8 + f];
+      s += w ? v : -v;
+    }
+    return s;
+  }
+  function orderScore(st, m) {
+    let s = 0;
+    const victim = m.epCap ? 'P' : (st.b[m.to] ? st.b[m.to].toUpperCase() : null);
+    if (victim) s += 10000 + VAL[victim] * 10 - VAL[st.b[m.from].toUpperCase()] / 10;
+    if (m.promo) s += 9000 + VAL[m.promo];
+    return s;
+  }
+  const MATE = 100000;
+  function search(st, depth, alpha, beta, ply) {
+    if (st.half >= 100) return 0;
+    if (depth === 0) return (st.turn === 'w' ? 1 : -1) * evaluate(st);
+    const ms = legalMoves(st);
+    if (ms.length === 0) return inCheck(st, st.turn) ? -MATE + ply : 0;
+    ms.sort((a, b) => orderScore(st, b) - orderScore(st, a));
+    let best = -Infinity;
+    for (const m of ms) {
+      const v = -search(applyMove(st, m), depth - 1, -beta, -alpha, ply + 1);
+      if (v > best) best = v;
+      if (best > alpha) alpha = best;
+      if (alpha >= beta) break;
+    }
+    return best;
+  }
+  function bestBySearch(ms, depth) {
+    const ordered = ms.slice().sort((a, b) => orderScore(st, b) - orderScore(st, a));
+    let best = -Infinity, cand = [];
+    for (const m of ordered) {
+      const v = -search(applyMove(st, m), depth - 1, -Infinity, Infinity, 1);
+      if (v > best + 1e-9) { best = v; cand = [m]; }
+      else if (Math.abs(v - best) <= 1e-9) cand.push(m);
+    }
+    return cand[Math.floor(Math.random() * cand.length)];
+  }
+  function cpuMove() {
+    const ms = legalMoves(st); if (!ms.length) return null;
+    const lv = settings.level;
+    if (lv === 0) { // 初級：ほぼランダム（少しだけ取れる手を優先）
+      const caps = ms.filter(m => st.b[m.to] || m.epCap);
+      if (caps.length && Math.random() < 0.4) {
+        caps.sort((a, b) => VAL[(st.b[b.to] || 'P').toUpperCase()] - VAL[(st.b[a.to] || 'P').toUpperCase()]);
+        return caps[0];
+      }
+      const nonPromo = ms.filter(m => !m.promo || m.promo === 'Q');
+      return nonPromo[Math.floor(Math.random() * nonPromo.length)];
+    }
+    if (lv === 1) { // 中級：1手先の材料＋位置評価で最善
+      let best = -Infinity, cand = [];
+      for (const m of ms) {
+        const ns = applyMove(st, m);
+        const vv = (st.turn === 'w' ? 1 : -1) * evaluate(ns); // 指した側から見た評価
+        if (vv > best) { best = vv; cand = [m]; } else if (vv === best) cand.push(m);
+      }
+      return cand[Math.floor(Math.random() * cand.length)];
+    }
+    if (lv === 2) return bestBySearch(ms, 2); // 上級：αβ 深さ2
+    return bestBySearch(ms, 3);               // 鬼：αβ 深さ3
+  }
+
+  // ---------- 画面・進行 ----------
+  const $ = id => document.getElementById(id);
+  const LEVEL_NAME = ['初級', '中級', '上級', '鬼'];
+  let st, selected, humanColor, gameOver, busy, lastMove, flip, turnMoves, pendingPromo;
+  const boardEl = document.getElementById('board');
+  const cells = [];
+  for (let d = 0; d < 64; d++) { // 表示順にセルを作り、各セルが盤indexを持つ
+    const dr = d >> 3, dc = d & 7;
+    const cell = document.createElement('div');
+    cell.className = 'sq';
+    cell.addEventListener('click', () => onSquare(cell._idx));
+    boardEl.appendChild(cell); cells.push(cell);
+  }
+  function dispIdx(dr, dc) { // 表示行列 → 盤index
+    if (!flip) return (7 - dr) * 8 + dc;
+    return dr * 8 + (7 - dc);
+  }
+  function isHumanTurn() { return settings.mode === '2p' || st.turn === humanColor; }
+  function colorName(c) { return c === 'w' ? '白' : '黒'; }
+  function playerLabel(c) {
+    if (settings.mode === '2p') return c === 'w' ? 'プレイヤー1' : 'プレイヤー2';
+    return c === humanColor ? 'あなた' : 'CPU（' + LEVEL_NAME[settings.level] + '）';
+  }
+  function capturedBy(color) { // color 側が取った駒（相手の駒）のタイプ一覧
+    const init = { P: 8, N: 2, B: 2, R: 2, Q: 1 };
+    const now = { P: 0, N: 0, B: 0, R: 0, Q: 0 };
+    const target = opp(color);
+    for (const p of st.b) {
+      if (p && colorOf(p) === target && now[p.toUpperCase()] !== undefined) now[p.toUpperCase()]++;
+    }
+    const out = [];
+    for (const t of ['Q','R','B','N','P']) for (let k = now[t]; k < init[t]; k++) out.push(t);
+    return out;
+  }
+  function renderCaptured(el, color) { // color 側が取った駒を、取られた側の色で並べる
+    el.innerHTML = '';
+    const victimColor = opp(color);
+    for (const t of capturedBy(color)) {
+      const s = document.createElement('span');
+      s.className = 'piece ' + victimColor;
+      s.textContent = GLYPH[victimColor === 'w' ? t : t.toLowerCase()];
+      el.appendChild(s);
+    }
+  }
+  function material(color) {
+    let s = 0;
+    for (const p of st.b) if (p && colorOf(p) === color) s += VAL[p.toUpperCase()];
+    return s;
+  }
+  function render() {
+    for (let d = 0; d < 64; d++) {
+      const dr = d >> 3, dc = d & 7, idx = dispIdx(dr, dc);
+      const cell = cells[d]; cell._idx = idx; cell.innerHTML = '';
+      const r = idx >> 3, f = idx & 7;
+      cell.className = 'sq ' + (((r + f) % 2 === 0) ? 'dark' : 'light');
+      if (lastMove && (idx === lastMove.from || idx === lastMove.to)) cell.classList.add('lastmove');
+      if (idx === selected) cell.classList.add('sel');
+      const p = st.b[idx];
+      if (p && p.toUpperCase() === 'K' && colorOf(p) === st.turn && !gameOver && inCheck(st, st.turn)) cell.classList.add('incheck');
+      if (p) {
+        const s = document.createElement('span');
+        s.className = 'piece ' + colorOf(p);
+        s.textContent = GLYPH[p];
+        cell.appendChild(s);
+      }
+      if (!gameOver && isHumanTurn() && selected >= 0) {
+        const hits = turnMoves.filter(m => m.from === selected && m.to === idx);
+        if (hits.length) {
+          cell.classList.add('clickable');
+          if (settings.guide) {
+            const g = document.createElement('div');
+            g.className = p ? 'ring' : 'dot';
+            cell.appendChild(g);
+          }
+        }
+      }
+      if (!gameOver && isHumanTurn() && p && colorOf(p) === st.turn) cell.classList.add('clickable');
+    }
+    const topColor = flip ? 'w' : 'b', bottomColor = opp(topColor);
+    renderCaptured($('capTop'), topColor);
+    renderCaptured($('capBottom'), bottomColor);
+    const diff = material('w') - material('b');
+    const fmt = v => '+' + (Math.round(v / 10) / 10).toString().replace(/\.0$/, '');
+    $('advW').textContent = diff > 0 ? fmt(diff) : '';
+    $('advB').textContent = diff < 0 ? fmt(-diff) : '';
+    $('scoreW').classList.toggle('active', st.turn === 'w' && !gameOver);
+    $('scoreB').classList.toggle('active', st.turn === 'b' && !gameOver);
+    const stEl = $('status');
+    if (gameOver) stEl.textContent = '対戦終了';
+    else if (isHumanTurn()) stEl.innerHTML = '<span class="turn-disc" style="background:' + (st.turn === 'w' ? '#fff' : '#23233F') + '"></span>' + playerLabel(st.turn) + 'の番です（' + colorName(st.turn) + '）' + (inCheck(st, st.turn) ? ' ― チェック！' : '');
+    else stEl.innerHTML = '<span class="turn-disc" style="background:' + (st.turn === 'w' ? '#fff' : '#23233F') + '"></span>CPUが考え中…';
+    if (settings.mode === '2p') {
+      $('advFar').textContent = $('advB').textContent;
+      $('scoreFar').classList.toggle('active', st.turn === 'b' && !gameOver);
+      $('statusFar').textContent = gameOver ? '対戦終了' : (st.turn === 'b' ? 'あなたの番です（黒）' + (inCheck(st, 'b') ? ' ― チェック！' : '') : 'プレイヤー1の番です（白）');
+      $('advNear').textContent = $('advW').textContent;
+      $('scoreNear').classList.toggle('active', st.turn === 'w' && !gameOver);
+      $('statusNear').textContent = gameOver ? '対戦終了' : (st.turn === 'w' ? 'あなたの番です（白）' + (inCheck(st, 'w') ? ' ― チェック！' : '') : 'プレイヤー2の番です（黒）');
+    }
+  }
+  function setMsg(t) { $('msg').textContent = t || ''; if (settings.mode === '2p') $('msgFar').textContent = t || ''; }
+  function startGame() {
+    st = initialState();
+    selected = -1; gameOver = false; busy = false; lastMove = null; pendingPromo = null; turnMoves = [];
+    if (settings.mode === 'cpu') {
+      humanColor = settings.order === 'first' ? 'w' : settings.order === 'second' ? 'b' : (Math.random() < 0.5 ? 'w' : 'b');
+    }
+    flip = settings.mode === 'cpu' && humanColor === 'b';
+    $('nameW').textContent = settings.mode === '2p' ? 'プレイヤー1・白' : (humanColor === 'w' ? 'あなた・白' : 'CPU・白');
+    $('nameB').textContent = settings.mode === '2p' ? 'プレイヤー2・黒' : (humanColor === 'b' ? 'あなた・黒' : 'CPU・黒');
+    $('farBar').hidden = settings.mode !== '2p';
+    $('nearBar').hidden = settings.mode !== '2p';
+    $('gameTop').hidden = settings.mode === '2p';
+    $('scoreBar').hidden = settings.mode === '2p';
+    $('capTop').classList.toggle('flip', settings.mode === '2p');
+    $('board').classList.toggle('f2p', settings.mode === '2p');
+    $('screenSettings').hidden = true;
+    document.querySelector('.hero').style.display = 'none';
+    $('screenGame').hidden = false;
+    if (settings.mode === 'cpu' && settings.order === 'random') setMsg('ランダムの結果：あなたは' + colorName(humanColor) + 'になりました'); else setMsg('');
+    proceed();
+  }
+  function proceed() {
+    if (gameOver) return;
+    turnMoves = legalMoves(st);
+    if (turnMoves.length === 0) { finish(inCheck(st, st.turn) ? 'mate' : 'stale'); return; }
+    if (st.half >= 100) { finish('fifty'); return; }
+    if (insufficientMaterial(st.b)) { finish('material'); return; }
+    render();
+    if (!isHumanTurn()) {
+      busy = true; render();
+      setTimeout(() => {
+        const m = cpuMove();
+        busy = false;
+        if (m) doMove(m);
+      }, 500 + Math.random() * 450);
+    }
+  }
+  function doMove(m) {
+    st = applyMove(st, m);
+    lastMove = { from: m.from, to: m.to };
+    selected = -1;
+    if (!(settings.mode === 'cpu' && settings.order === 'random')) setMsg('');
+    proceed();
+  }
+  function onSquare(idx) {
+    if (gameOver || busy || !isHumanTurn()) return;
+    if ($('overlayPromo').classList.contains('show')) return;
+    if (selected >= 0) {
+      const cand = turnMoves.filter(m => m.from === selected && m.to === idx);
+      if (cand.length > 1) { openPromo(cand); return; }
+      if (cand.length === 1) { doMove(cand[0]); return; }
+    }
+    const p = st.b[idx];
+    if (p && colorOf(p) === st.turn) selected = (selected === idx) ? -1 : idx;
+    render();
+  }
+  function openPromo(cand) {
+    pendingPromo = cand;
+    const box = $('promoBtns'); box.innerHTML = '';
+    for (const t of ['Q','R','B','N']) {
+      const b = document.createElement('button');
+      const glyph = st.turn === 'w' ? t : t.toLowerCase();
+      b.innerHTML = '<span class="piece ' + st.turn + '">' + GLYPH[glyph] + '</span>';
+      b.addEventListener('click', () => {
+        const m = pendingPromo.find(x => x.promo === t);
+        $('overlayPromo').classList.remove('show');
+        pendingPromo = null;
+        if (m) doMove(m);
+      });
+      box.appendChild(b);
+    }
+    $('overlayPromo').classList.add('show');
+  }
+  function finish(kind) {
+    gameOver = true; render();
+    let title, score, text;
+    if (kind === 'mate') {
+      const winner = opp(st.turn);
+      score = 'チェックメイト';
+      if (settings.mode === '2p') {
+        title = (winner === 'w' ? 'プレイヤー1（白）' : 'プレイヤー2（黒）') + 'の勝ち';
+        text = 'おつかれさまでした。';
+      } else {
+        title = winner === humanColor ? 'あなたの勝ち！' : 'CPUの勝ち';
+        text = winner === humanColor ? '見事な詰みでした。' : '詰まされてしまいました。もう一度挑戦してみましょう。';
+      }
+    } else {
+      title = '引き分け';
+      score = kind === 'stale' ? 'ステイルメイト' : kind === 'fifty' ? '50手ルール' : '駒不足';
+      text = '決着はつきませんでした。';
+    }
+    $('resultTitle').textContent = title;
+    $('resultScore').textContent = score;
+    $('resultText').textContent = text;
+    $('overlayResult').classList.add('show');
+  }
+
+  // ---------- 画面遷移 ----------
+  $('btnStart').addEventListener('click', startGame);
+  $('btnToTitle').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnToTitleFar').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnToTitleNear').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnCancelBack').addEventListener('click', () => $('overlayConfirm').classList.remove('show'));
+  $('btnDoBack').addEventListener('click', () => {
+    $('overlayConfirm').classList.remove('show');
+    $('screenGame').hidden = true;
+    $('screenSettings').hidden = false;
+    document.querySelector('.hero').style.display = '';
+  });
+  $('btnPromoCancel').addEventListener('click', () => { $('overlayPromo').classList.remove('show'); pendingPromo = null; });
+  $('btnAgain').addEventListener('click', () => { $('overlayResult').classList.remove('show'); startGame(); });
+  $('btnResultTitle').addEventListener('click', () => {
+    $('overlayResult').classList.remove('show');
+    $('screenGame').hidden = true;
+    $('screenSettings').hidden = false;
+    document.querySelector('.hero').style.display = '';
+  });
+</script>
+<script src="/season.js" defer></script>
+</body>
+</html>
