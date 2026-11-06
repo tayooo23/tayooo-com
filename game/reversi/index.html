@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リバーシ — tayooo</title>
+<meta name="description" content="CPU対戦（4段階）も2人プレイもできるリバーシ。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237e8e9e'/%3E%3Ccircle cx='50' cy='62' r='20' fill='%23FFF3E2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);--accent:#C9502E;}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;position:relative;z-index:1;}
+  .hero{background:linear-gradient(180deg,#7e8e9e 0%,#857a80 58%,#e18c6d 100%);border:2.5px solid var(--ink);border-radius:20px;box-shadow:9px 9px 0 var(--ink);padding:26px 38px 0;color:#fff;overflow:hidden;position:relative;}
+  .hero .kicker{font-family:Consolas,monospace;font-size:12px;letter-spacing:.35em;font-weight:700;color:#FFF1E2;}
+  .hero .back{position:absolute;top:24px;right:38px;font-size:12.5px;font-weight:700;color:#FFF1E2;}
+  .hero .back:hover{color:#fff;text-decoration:underline;}
+  .hero h1{font-family:"DT Getai Grotesk Display","Noto Sans JP",sans-serif;font-size:44px;font-weight:900;line-height:1.05;margin-top:6px;color:#fff;}
+  .hero h1 .dot{color:#FFD9AE;}
+  .hero p{margin-top:8px;font-size:14px;font-weight:700;color:#FFF6EC;}
+  .mountains{display:block;width:calc(100% + 76px);margin:10px -38px 0;height:60px;}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}.hero{padding:18px 20px 0;box-shadow:6px 6px 0 var(--ink);border-radius:16px;}.hero .back{top:16px;right:20px;}.hero h1{font-size:30px;}.mountains{width:calc(100% + 40px);margin:6px -20px 0;height:44px;}}
+
+  .card{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:24px;margin-top:28px;}
+  .btn{font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:900;border:2.5px solid var(--ink);border-radius:999px;padding:10px 30px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease;background:#fff;color:var(--ink);}
+  .btn:hover{transform:translate(1px,1px);box-shadow:3px 3px 0 var(--ink);}
+  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);}
+  .btn.main{background:var(--accent);color:#fff;min-width:190px;}
+  .btn.small{font-size:12.5px;padding:7px 16px;box-shadow:3px 3px 0 var(--ink);}
+
+  /* 設定画面 */
+  .group{margin-top:22px;}
+  .group:first-of-type{margin-top:6px;}
+  .glabel{font-size:11px;font-weight:900;letter-spacing:.28em;color:#A79BA8;margin-bottom:9px;}
+  .seg{display:flex;gap:9px;flex-wrap:wrap;}
+  .seg button{flex:1 1 0;min-width:96px;font-family:"Noto Sans JP",sans-serif;font-size:14.5px;font-weight:900;border:2.5px solid var(--ink);border-radius:12px;padding:11px 6px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);transition:transform .1s ease,box-shadow .1s ease,background .1s ease;}
+  .seg button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink);}
+  .seg button.on{background:var(--accent);border-color:var(--ink);color:#fff;}
+  .seg button .sub{display:block;font-size:10.5px;font-weight:700;opacity:.75;margin-top:2px;}
+  .group.off{opacity:.38;pointer-events:none;filter:grayscale(.4);}
+  .guide-row{display:flex;align-items:center;gap:12px;border:2px solid #E4DCCF;border-radius:12px;padding:13px 15px;background:#FFFDF9;cursor:pointer;}
+  .guide-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer;flex:none;}
+  .guide-row .gt{font-size:14.5px;font-weight:900;}
+  .guide-row .gd{font-size:11.5px;color:#A79BA8;font-weight:500;}
+  .start-wrap{margin-top:30px;text-align:center;}
+  .note{margin-top:16px;font-size:12px;color:#A79BA8;text-align:center;font-weight:500;}
+
+  /* 対戦画面 */
+  .game-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .game-top .status{min-width:0;}
+  .game-top .btn{flex:none;white-space:nowrap;}
+  .status{font-size:16px;font-weight:900;min-height:24px;}
+  .status .turn-disc{display:inline-block;width:15px;height:15px;border-radius:50%;border:2px solid var(--ink);vertical-align:-2px;margin-right:6px;}
+  .scorebar{display:flex;gap:10px;margin-top:14px;}
+  .score{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid #E4DCCF;border-radius:12px;padding:9px 6px;background:#FFFDF9;font-weight:900;font-size:15px;}
+  .score.active{border-color:var(--accent);background:#FFE9DC;}
+  .score .disc{width:19px;height:19px;border-radius:50%;border:2px solid var(--ink);flex:none;}
+  .disc.b{background:radial-gradient(circle at 35% 32%,#4a4a68,#23233F 70%);}
+  .disc.w{background:radial-gradient(circle at 35% 32%,#ffffff,#E8E2D4 75%);}
+  .board-frame{margin:18px auto 4px;width:min(520px,100%);background:#0B5136;border:2.5px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);padding:9px;}
+  .board{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;}
+  .cell{position:relative;aspect-ratio:1;background:linear-gradient(145deg,#2F9E63,#26804F);border-radius:5px;cursor:default;display:flex;align-items:center;justify-content:center;}
+  .cell.playable{cursor:pointer;}
+  .cell.playable:hover{background:linear-gradient(145deg,#37B671,#2A8C57);}
+  .cell .stone{width:82%;height:82%;border-radius:50%;border:2px solid var(--ink);pointer-events:none;}
+  .cell .stone.b{background:radial-gradient(circle at 35% 30%,#4a4a68,#23233F 72%);box-shadow:1px 2px 0 rgba(0,0,0,.35);}
+  .cell .stone.w{background:radial-gradient(circle at 35% 30%,#ffffff,#E8E2D4 78%);box-shadow:1px 2px 0 rgba(0,0,0,.3);}
+  .cell .stone.flip{animation:flip .34s ease;}
+  @keyframes flip{0%{transform:scaleX(1);}50%{transform:scaleX(.08);}100%{transform:scaleX(1);}}
+  .cell.guided{box-shadow:inset 0 0 0 3px rgba(255,233,184,.95),inset 0 0 16px rgba(255,233,184,.45);background:linear-gradient(145deg,#3CB874,#2F9E63);}
+  .cell .cnt{position:absolute;right:3px;bottom:1px;font-family:Consolas,monospace;font-size:10px;font-weight:700;color:#FFE9B8;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+  .cell .last{position:absolute;left:4px;top:4px;width:7px;height:7px;border-radius:50%;background:var(--salmon);border:1.5px solid var(--ink);pointer-events:none;}
+  .msg{min-height:22px;text-align:center;font-size:13.5px;font-weight:700;color:#6E6A7E;margin-top:12px;}
+  /* 2人プレイ：向かい側プレイヤー用バー（180度回転） */
+  .farbar{transform:rotate(180deg);border-top:2px dashed #E4DCCF;padding-top:14px;margin-bottom:16px;}
+  #nearBar{margin-top:30px;}
+  .farbar .game-top{margin-bottom:10px;}
+  .farbar .msg{margin-top:8px;}
+
+  /* モーダル */
+  .overlay{position:fixed;inset:0;background:rgba(35,35,63,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:7px 7px 0 var(--ink);padding:26px 24px;max-width:380px;width:100%;text-align:center;animation:pop .3s ease;}
+  @keyframes pop{0%{transform:scale(.94);}60%{transform:scale(1.02);}100%{transform:scale(1);}}
+  .modal h2{font-size:21px;font-weight:900;}
+  .modal p{margin-top:10px;font-size:13.5px;color:#6E6A7E;font-weight:500;line-height:1.6;}
+  .modal .mbtns{display:flex;gap:11px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+  .modal .final-score{font-size:17px;font-weight:900;margin-top:12px;}
+  [hidden]{display:none !important;}
+  @media (max-width:700px){.card{padding:18px 14px;}.seg button{min-width:70px;font-size:13.5px;}.status{font-size:14.5px;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">GAME/REVERSI</div>
+    <a class="back" href="/game/">← game 一覧</a>
+    <h1>reversi<span class="dot">.</span></h1>
+    <p>挟んでひっくり返す、定番のやつ。</p>
+    <svg class="mountains" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="806" cy="86" r="17" fill="#FFD9AE" stroke="none" opacity="0.95"/>
+      <path d="M-10,116 L170,116 L246,80 L298,102 L362,60 L428,98 L498,54 L562,90 L632,48 L706,94 L772,66 L852,104 L922,84 L1010,108" stroke="#FFF3E2" stroke-width="2" opacity="0.45"/>
+      <path d="M-10,128 L236,128 L318,88 L372,108 L442,70 L522,110 L598,64 L672,104 L740,80 L816,114 L884,94 L1010,118" stroke="#FFF3E2" stroke-width="2.4" opacity="0.95"/>
+    </svg>
+  </div>
+
+  <!-- 設定画面 -->
+  <div class="card" id="screenSettings">
+    <div class="group">
+      <div class="glabel">対戦相手</div>
+      <div class="seg" id="segMode">
+        <button data-v="cpu" class="on">1人でプレイ<span class="sub">CPU対戦</span></button>
+        <button data-v="2p">2人でプレイ<span class="sub">対面で交互に</span></button>
+      </div>
+    </div>
+    <div class="group" id="groupLevel">
+      <div class="glabel">難易度</div>
+      <div class="seg" id="segLevel">
+        <button data-v="0">初級</button>
+        <button data-v="1" class="on">中級</button>
+        <button data-v="2">上級</button>
+        <button data-v="3">鬼</button>
+      </div>
+    </div>
+    <div class="group" id="groupOrder">
+      <div class="glabel">順番</div>
+      <div class="seg" id="segOrder">
+        <button data-v="first" class="on">先攻<span class="sub">黒</span></button>
+        <button data-v="second">後攻<span class="sub">白</span></button>
+        <button data-v="random">ランダム</button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="glabel">ガイド</div>
+      <label class="guide-row">
+        <input type="checkbox" id="chkGuide" checked>
+        <span><span class="gt">ガイドを表示する</span><br><span class="gd">置ける場所を枠で照らして表示します</span></span>
+      </label>
+    </div>
+    <div class="start-wrap">
+      <button class="btn main" id="btnStart">スタート</button>
+    </div>
+    <p class="note">2人でプレイのときは、難易度と順番は使いません。</p>
+  </div>
+
+  <!-- 対戦画面 -->
+  <div class="card" id="screenGame" hidden>
+    <div class="farbar" id="farBar" hidden>
+      <div class="game-top">
+        <div class="status" id="statusFar"></div>
+        <button class="btn small" id="btnToTitleFar">タイトルへ戻る</button>
+      </div>
+      <div class="score" id="scoreFar"><span class="disc w"></span><span>プレイヤー2・白</span><span id="cntFar">2</span></div>
+      <p class="msg" id="msgFar"></p>
+    </div>
+    <div class="game-top" id="gameTop">
+      <div class="status" id="status"></div>
+      <button class="btn small" id="btnToTitle">タイトルへ戻る</button>
+    </div>
+    <div class="scorebar" id="scoreBar">
+      <div class="score" id="scoreB"><span class="disc b"></span><span id="nameB">黒</span><span id="cntB">2</span></div>
+      <div class="score" id="scoreW"><span class="disc w"></span><span id="nameW">白</span><span id="cntW">2</span></div>
+    </div>
+    <div class="board-frame"><div class="board" id="board"></div></div>
+    <div id="nearBar" hidden>
+      <div class="game-top">
+        <div class="status" id="statusNear"></div>
+        <button class="btn small" id="btnToTitleNear">タイトルへ戻る</button>
+      </div>
+      <div class="score" id="scoreNear" style="margin-top:10px;"><span class="disc b"></span><span>プレイヤー1・黒</span><span id="cntNear">2</span></div>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+
+<!-- 確認モーダル -->
+<div class="overlay" id="overlayConfirm">
+  <div class="modal">
+    <h2>タイトルに戻りますか？</h2>
+    <p>対戦中の内容は破棄されます。</p>
+    <div class="mbtns">
+      <button class="btn" id="btnCancelBack">やめる</button>
+      <button class="btn main" id="btnDoBack" style="min-width:120px;">戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- 結果モーダル -->
+<div class="overlay" id="overlayResult">
+  <div class="modal">
+    <h2 id="resultTitle">結果</h2>
+    <div class="final-score" id="resultScore"></div>
+    <p id="resultText"></p>
+    <div class="mbtns">
+      <button class="btn" id="btnAgain">もう一度</button>
+      <button class="btn main" id="btnResultTitle" style="min-width:120px;">タイトルへ戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- 設定 ----------
+  const settings = { mode: 'cpu', level: 1, order: 'first', guide: true };
+  function bindSeg(id, key, cb) {
+    const el = document.getElementById(id);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      settings[key] = key === 'level' ? Number(b.dataset.v) : b.dataset.v;
+      if (cb) cb();
+    });
+  }
+  bindSeg('segMode', 'mode', () => {
+    const cpu = settings.mode === 'cpu';
+    document.getElementById('groupLevel').classList.toggle('off', !cpu);
+    document.getElementById('groupOrder').classList.toggle('off', !cpu);
+  });
+  bindSeg('segLevel', 'level');
+  bindSeg('segOrder', 'order');
+  document.getElementById('chkGuide').addEventListener('change', e => { settings.guide = e.target.checked; });
+
+  // ---------- リバーシ本体 ----------
+  const EMPTY = 0, BLACK = 1, WHITE = 2;
+  const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  let board, turn, humanColor, gameOver, busy, lastMove;
+  const boardEl = document.getElementById('board');
+  const cells = [];
+  for (let i = 0; i < 64; i++) {
+    const c = document.createElement('div');
+    c.className = 'cell';
+    c.addEventListener('click', () => onCell(i));
+    boardEl.appendChild(c); cells.push(c);
+  }
+  const inB = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+  function flipsFor(bd, idx, color) {
+    if (bd[idx] !== EMPTY) return [];
+    const opp = 3 - color, r = Math.floor(idx / 8), c = idx % 8, out = [];
+    for (const [dr, dc] of DIRS) {
+      const line = []; let rr = r + dr, cc = c + dc;
+      while (inB(rr, cc) && bd[rr * 8 + cc] === opp) { line.push(rr * 8 + cc); rr += dr; cc += dc; }
+      if (line.length && inB(rr, cc) && bd[rr * 8 + cc] === color) out.push(...line);
+    }
+    return out;
+  }
+  function legalMoves(bd, color) {
+    const ms = [];
+    for (let i = 0; i < 64; i++) { const f = flipsFor(bd, i, color); if (f.length) ms.push({ idx: i, flips: f }); }
+    return ms;
+  }
+  function applyMove(bd, m, color) { bd[m.idx] = color; for (const f of m.flips) bd[f] = color; }
+  function countDiscs(bd) { let b = 0, w = 0; for (const v of bd) { if (v === 1) b++; else if (v === 2) w++; } return [b, w]; }
+
+  const WEIGHT = [
+    120,-20, 20,  5,  5, 20,-20,120,
+    -20,-40, -5, -5, -5, -5,-40,-20,
+     20, -5, 15,  3,  3, 15, -5, 20,
+      5, -5,  3,  3,  3,  3, -5,  5,
+      5, -5,  3,  3,  3,  3, -5,  5,
+     20, -5, 15,  3,  3, 15, -5, 20,
+    -20,-40, -5, -5, -5, -5,-40,-20,
+    120,-20, 20,  5,  5, 20,-20,120
+  ];
+  function evalBoard(bd, color) {
+    const opp = 3 - color; let s = 0;
+    for (let i = 0; i < 64; i++) { if (bd[i] === color) s += WEIGHT[i]; else if (bd[i] === opp) s -= WEIGHT[i]; }
+    s += (legalMoves(bd, color).length - legalMoves(bd, opp).length) * 6;
+    return s;
+  }
+  function negamax(bd, color, depth, alpha, beta) {
+    const ms = legalMoves(bd, color), opp = 3 - color;
+    const oppMs = legalMoves(bd, opp);
+    if (depth === 0 || (ms.length === 0 && oppMs.length === 0)) {
+      if (ms.length === 0 && oppMs.length === 0) { const [b, w] = countDiscs(bd); const d = color === BLACK ? b - w : w - b; return d * 10; }
+      return evalBoard(bd, color);
+    }
+    if (ms.length === 0) return -negamax(bd, opp, depth - 1, -beta, -alpha);
+    ms.sort((a, b2) => WEIGHT[b2.idx] - WEIGHT[a.idx]);
+    let best = -Infinity;
+    for (const m of ms) {
+      const nb = bd.slice(); applyMove(nb, m, color);
+      const v = -negamax(nb, opp, depth - 1, -beta, -alpha);
+      if (v > best) best = v;
+      if (best > alpha) alpha = best;
+      if (alpha >= beta) break;
+    }
+    return best;
+  }
+  function cpuMove() {
+    const ms = legalMoves(board, turn); if (!ms.length) return null;
+    const lv = settings.level;
+    if (lv === 0) { // 初級：ほぼランダム（たまに一番多く取れる手）
+      if (Math.random() < 0.25) { const mx = Math.max(...ms.map(m => m.flips.length)); return ms.filter(m => m.flips.length === mx)[0]; }
+      return ms[Math.floor(Math.random() * ms.length)];
+    }
+    if (lv === 1) { // 中級：取れる枚数が最大（同点はランダム）
+      const mx = Math.max(...ms.map(m => m.flips.length));
+      const top = ms.filter(m => m.flips.length === mx);
+      return top[Math.floor(Math.random() * top.length)];
+    }
+    if (lv === 2) { // 上級：局面評価が最大
+      let best = -Infinity, cand = [];
+      for (const m of ms) { const nb = board.slice(); applyMove(nb, m, turn); const v = evalBoard(nb, turn); if (v > best) { best = v; cand = [m]; } else if (v === best) cand.push(m); }
+      return cand[Math.floor(Math.random() * cand.length)];
+    }
+    // 鬼：先読み（終盤は完全読み）
+    const empties = board.filter(v => v === EMPTY).length;
+    const depth = empties <= 12 ? empties : 6;
+    let best = -Infinity, chosen = ms[0], alpha = -Infinity;
+    ms.sort((a, b) => WEIGHT[b.idx] - WEIGHT[a.idx]);
+    for (const m of ms) {
+      const nb = board.slice(); applyMove(nb, m, turn);
+      const v = -negamax(nb, 3 - turn, depth - 1, -Infinity, -alpha);
+      if (v > best) { best = v; chosen = m; }
+      if (best > alpha) alpha = best;
+    }
+    return chosen;
+  }
+
+  // ---------- 画面・進行 ----------
+  const $ = id => document.getElementById(id);
+  const LEVEL_NAME = ['初級', '中級', '上級', '鬼'];
+  function isHumanTurn() { return settings.mode === '2p' || turn === humanColor; }
+  function colorName(c) { return c === BLACK ? '黒' : '白'; }
+  function playerLabel(c) {
+    if (settings.mode === '2p') return c === BLACK ? 'プレイヤー1' : 'プレイヤー2';
+    return c === humanColor ? 'あなた' : 'CPU（' + LEVEL_NAME[settings.level] + '）';
+  }
+  function render(flipIdxs) {
+    const moves = (!gameOver && isHumanTurn()) ? legalMoves(board, turn) : [];
+    const moveMap = new Map(moves.map(m => [m.idx, m.flips.length]));
+    for (let i = 0; i < 64; i++) {
+      const cell = cells[i]; cell.innerHTML = '';
+      cell.classList.toggle('playable', moveMap.has(i));
+      cell.classList.toggle('guided', settings.guide && moveMap.has(i));
+      if (board[i] !== EMPTY) {
+        const s = document.createElement('div');
+        s.className = 'stone ' + (board[i] === BLACK ? 'b' : 'w');
+        if (flipIdxs && flipIdxs.includes(i)) s.classList.add('flip');
+        cell.appendChild(s);
+      }
+      if (i === lastMove) { const l = document.createElement('div'); l.className = 'last'; cell.appendChild(l); }
+    }
+    const [b, w] = countDiscs(board);
+    $('cntB').textContent = b; $('cntW').textContent = w;
+    $('scoreB').classList.toggle('active', turn === BLACK && !gameOver);
+    $('scoreW').classList.toggle('active', turn === WHITE && !gameOver);
+    const st = $('status');
+    if (gameOver) st.textContent = '対戦終了';
+    else if (isHumanTurn()) st.innerHTML = '<span class="turn-disc" style="background:' + (turn === BLACK ? '#23233F' : '#fff') + '"></span>' + playerLabel(turn) + 'の番です（' + colorName(turn) + '）';
+    else st.innerHTML = '<span class="turn-disc" style="background:' + (turn === BLACK ? '#23233F' : '#fff') + '"></span>CPUが考え中…';
+    if (settings.mode === '2p') {
+      $('cntFar').textContent = w;
+      $('scoreFar').classList.toggle('active', turn === WHITE && !gameOver);
+      $('statusFar').textContent = gameOver ? '対戦終了' : (turn === WHITE ? 'あなたの番です（白）' : 'プレイヤー1の番です（黒）');
+      $('cntNear').textContent = b;
+      $('scoreNear').classList.toggle('active', turn === BLACK && !gameOver);
+      $('statusNear').textContent = gameOver ? '対戦終了' : (turn === BLACK ? 'あなたの番です（黒）' : 'プレイヤー2の番です（白）');
+    }
+  }
+  function setMsg(t) { $('msg').textContent = t || ''; if (settings.mode === '2p') $('msgFar').textContent = t || ''; }
+  function startGame() {
+    board = new Array(64).fill(EMPTY);
+    board[27] = WHITE; board[28] = BLACK; board[35] = BLACK; board[36] = WHITE;
+    turn = BLACK; gameOver = false; busy = false; lastMove = -1;
+    if (settings.mode === 'cpu') {
+      humanColor = settings.order === 'first' ? BLACK : settings.order === 'second' ? WHITE : (Math.random() < 0.5 ? BLACK : WHITE);
+    }
+    $('nameB').textContent = settings.mode === '2p' ? 'プレイヤー1・黒' : (humanColor === BLACK ? 'あなた・黒' : 'CPU・黒');
+    $('nameW').textContent = settings.mode === '2p' ? 'プレイヤー2・白' : (humanColor === WHITE ? 'あなた・白' : 'CPU・白');
+    $('farBar').hidden = settings.mode !== '2p';
+    $('nearBar').hidden = settings.mode !== '2p';
+    $('gameTop').hidden = settings.mode === '2p';
+    $('scoreBar').hidden = settings.mode === '2p';
+    $('screenSettings').hidden = true;
+    document.querySelector('.hero').style.display = 'none';
+    $('screenGame').hidden = false;
+    if (settings.mode === 'cpu' && settings.order === 'random') setMsg('ランダムの結果：あなたは' + colorName(humanColor) + 'になりました'); else setMsg('');
+    render();
+    proceed();
+  }
+  function proceed() {
+    if (gameOver) return;
+    const ms = legalMoves(board, turn);
+    if (ms.length === 0) {
+      if (legalMoves(board, 3 - turn).length === 0) { finish(); return; }
+      setMsg(colorName(turn) + 'は置ける場所がないのでパスします');
+      turn = 3 - turn; render();
+      setTimeout(proceed, 900);
+      return;
+    }
+    if (!isHumanTurn()) {
+      busy = true; render();
+      setTimeout(() => {
+        const m = cpuMove();
+        if (m) doMove(m);
+        busy = false;
+      }, 550 + Math.random() * 500);
+    }
+  }
+  function doMove(m) {
+    const flipIdxs = m.flips.slice();
+    applyMove(board, m, turn);
+    lastMove = m.idx;
+    turn = 3 - turn;
+    if (settings.mode === 'cpu' && settings.order === 'random') { /* メッセージ維持 */ } else setMsg('');
+    render(flipIdxs);
+    setTimeout(proceed, 60);
+  }
+  function onCell(i) {
+    if (gameOver || busy || !isHumanTurn()) return;
+    const m = legalMoves(board, turn).find(m => m.idx === i);
+    if (!m) return;
+    doMove(m);
+  }
+  function finish() {
+    gameOver = true; render();
+    const [b, w] = countDiscs(board);
+    let title, text;
+    if (settings.mode === '2p') {
+      title = b === w ? '引き分け' : (b > w ? 'プレイヤー1（黒）の勝ち' : 'プレイヤー2（白）の勝ち');
+      text = 'おつかれさまでした。';
+    } else {
+      const hw = humanColor === BLACK ? b : w, cw = humanColor === BLACK ? w : b;
+      title = hw === cw ? '引き分け' : hw > cw ? 'あなたの勝ち！' : 'CPUの勝ち';
+      text = hw > cw ? 'やりましたね。' : hw === cw ? '互角でした。' : 'もう一度挑戦してみましょう。';
+    }
+    $('resultTitle').textContent = title;
+    $('resultScore').textContent = '黒 ' + b + ' — ' + w + ' 白';
+    $('resultText').textContent = text;
+    $('overlayResult').classList.add('show');
+  }
+
+  // ---------- 画面遷移 ----------
+  $('btnStart').addEventListener('click', startGame);
+  $('btnToTitle').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnToTitleFar').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnToTitleNear').addEventListener('click', () => $('overlayConfirm').classList.add('show'));
+  $('btnCancelBack').addEventListener('click', () => $('overlayConfirm').classList.remove('show'));
+  $('btnDoBack').addEventListener('click', () => {
+    $('overlayConfirm').classList.remove('show');
+    $('screenGame').hidden = true;
+    $('screenSettings').hidden = false;
+    document.querySelector('.hero').style.display = '';
+  });
+  $('btnAgain').addEventListener('click', () => { $('overlayResult').classList.remove('show'); startGame(); });
+  $('btnResultTitle').addEventListener('click', () => {
+    $('overlayResult').classList.remove('show');
+    $('screenGame').hidden = true;
+    $('screenSettings').hidden = false;
+    document.querySelector('.hero').style.display = '';
+  });
+</script>
+<script src="/season.js" defer></script>
+</body>
+</html>
