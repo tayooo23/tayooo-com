@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>個人環境の構成図（2026年11月版） — tayooo</title>
+<meta name="description" content="自宅のRaspberry PiとOracle CloudのVMをTailscaleでつないだ個人環境の構成図。軽量デスクトップ、AIが操作できる仮想デスクトップ、Zabbix監視まで。">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--sky:#7e8e9e;--mauve:#857a80;--salmon:#e18c6d;--brown:#875e5c;--ink:#23233F;--paper:#FAF5EE;--grid:rgba(225,140,109,.28);}
+  @font-face{font-family:"DT Getai Grotesk Display";src:url("../../fonts/DTGetaiGroteskDisplay-Black.woff") format("woff");font-weight:900;font-display:swap;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--paper);background-size:26px 26px;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:880px;margin:0 auto;padding:30px 32px 40px;}
+  .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#fff;padding:3px 10px;border:2px solid var(--ink);border-radius:999px;white-space:nowrap;}
+  .tag.a{background:var(--salmon);} .tag.r{background:var(--sky);} .tag.v{background:var(--brown);} .tag.k{background:var(--mauve);}
+  footer{margin-top:40px;text-align:center;font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:#A79BA8;}
+  footer a:hover{color:#C9502E;}
+  @media (max-width:700px){.wrap{padding:16px 14px 26px;}}
+
+  .backlink{display:inline-block;margin-top:26px;font-size:12.5px;font-weight:700;color:#8A7F8C;}
+  .backlink:hover{color:#C9502E;}
+  article{background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:34px 40px 30px;margin-top:14px;}
+  .meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .meta .date{font-family:Consolas,monospace;font-size:12.5px;color:#A79BA8;}
+  article h1{font-size:27px;font-weight:900;line-height:1.45;margin-bottom:22px;}
+  article h2{font-size:19px;font-weight:900;line-height:1.4;margin:30px 0 12px;padding-left:12px;border-left:6px solid #C9502E;}
+  article h2:first-of-type{margin-top:6px;}
+  article p{font-size:14.5px;font-weight:500;line-height:1.95;margin-bottom:16px;color:#33334D;}
+  article ul{margin:0 0 16px 20px;}
+  article li{font-size:14.5px;font-weight:500;line-height:1.9;color:#33334D;margin-bottom:4px;}
+  table{width:100%;border-collapse:collapse;margin:6px 0 20px;font-size:13.5px;}
+  th,td{border:1.8px solid var(--ink);padding:7px 10px;text-align:left;line-height:1.5;}
+  th{background:var(--paper);font-weight:900;font-size:12.5px;letter-spacing:.04em;}
+  .diagram{border:2px solid #E3E3E8;border-radius:12px;background:#fff;padding:14px 10px 8px;margin:6px 0 8px;overflow-x:auto;}
+  .diagram svg{display:block;min-width:680px;width:100%;height:auto;font-family:"Noto Sans JP",sans-serif;}
+  .cap{font-size:12px;line-height:1.8;color:#8A7F8C;margin-bottom:18px;}
+  .toindex{margin-top:22px;text-align:center;}
+  .toindex a{font-size:12.5px;font-weight:900;border:2px solid var(--ink);border-radius:999px;padding:6px 18px;background:#fff;display:inline-block;}
+  .toindex a:hover{background:#F3E7DA;}
+  @media (max-width:700px){article{padding:22px 18px;}article h1{font-size:21px;}table{font-size:12.5px;}th,td{padding:6px 7px;}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <a class="backlink" href="/blog/">← blog 一覧</a>
+  <article>
+    <div class="meta"><span class="tag a">Dev</span><span class="date">2026-11-07</span></div>
+    <h1>個人環境の構成図（2026年11月版）</h1>
+
+    <p>個人で運用している環境の棚卸し。物理マシンは自宅の Raspberry Pi 1台だけで、あとはクラウドの VM と Tailscale でつないでいる。ポート開放はゼロで、接続は原則すべて Tailscale 経由。重い作業はクラウド側に逃がして、自宅は静かに回す、という分担である。</p>
+
+    <h2>構成図</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 800 560" role="img" aria-label="個人環境の構成図">
+        <defs>
+          <pattern id="gridp" width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M24,0 L0,0 0,24" fill="none" stroke="#E8E8ED" stroke-width="1"/>
+          </pattern>
+          <marker id="arwB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/>
+          </marker>
+          <marker id="arwG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="800" height="560" fill="#FFFFFF"/>
+        <rect x="0" y="0" width="800" height="560" fill="url(#gridp)"/>
+
+        <!-- 自宅フレーム -->
+        <rect x="16" y="56" width="288" height="322" rx="12" fill="rgba(245,247,249,.75)" stroke="#C7D0D8" stroke-width="1.8"/>
+        <text x="34" y="84" font-size="13" font-weight="900" fill="#374151">自宅</text>
+        <text x="70" y="84" font-size="10.5" fill="#9CA3AF" font-family="Consolas,monospace">LAN 192.168.0.0/24</text>
+
+        <!-- ルーター -->
+        <rect x="39" y="99" width="256" height="56" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="36" y="96" width="256" height="56" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/tplink.svg" x="48" y="111" width="26" height="26"/>
+        <text x="86" y="121" font-size="14" font-weight="900" fill="#111827">TP-Link Archer AX1500</text>
+        <text x="86" y="141" font-size="11" fill="#6B7280">ルーター／ゲートウェイ</text>
+
+        <!-- ラズパイ -->
+        <rect x="39" y="181" width="256" height="76" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="36" y="178" width="256" height="76" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/raspberrypi.svg" x="48" y="203" width="26" height="26"/>
+        <image href="logos/zabbix.svg" x="202" y="187" width="80" height="21"/>
+        <text x="86" y="203" font-size="14" font-weight="900" fill="#111827">Raspberry Pi</text>
+        <text x="86" y="223" font-size="11" fill="#6B7280">Debian 13／Zabbix 監視サーバー</text>
+        <text x="86" y="241" font-size="11" fill="#6B7280">サブネットルーター／出口ノード</text>
+
+        <!-- デスクトップ -->
+        <rect x="39" y="283" width="256" height="56" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="36" y="280" width="256" height="56" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/windows.svg" x="48" y="295" width="26" height="26"/>
+        <text x="86" y="305" font-size="14" font-weight="900" fill="#111827">Windows デスクトップ</text>
+        <text x="86" y="325" font-size="11" fill="#6B7280">メイン機／Tailscale 参加</text>
+
+        <!-- Oracleフレーム -->
+        <rect x="496" y="56" width="288" height="322" rx="12" fill="rgba(254,243,238,.8)" stroke="#F2C1A8" stroke-width="1.8"/>
+        <image href="logos/oracle.svg" x="514" y="68" width="17" height="17"/>
+        <text x="538" y="82" font-size="13" font-weight="900" fill="#374151">Oracle Cloud（OCI）</text>
+
+        <!-- VM -->
+        <rect x="519" y="99" width="256" height="76" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="516" y="96" width="256" height="76" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/ubuntu.svg" x="528" y="121" width="26" height="26"/>
+        <text x="566" y="121" font-size="14" font-weight="900" fill="#111827">VM（Ubuntu 24.04／arm64）</text>
+        <text x="566" y="141" font-size="11" fill="#6B7280">4コア・メモリ24GB・ディスク45GB</text>
+        <text x="566" y="159" font-size="11" fill="#6B7280">Xfce + XRDP の軽量デスクトップ</text>
+
+        <!-- Muse用デスクトップ -->
+        <rect x="519" y="197" width="256" height="64" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="516" y="194" width="256" height="64" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/tigervnc.png" x="528" y="213" width="26" height="26"/>
+        <image href="logos/googlechrome.svg" x="734" y="214" width="24" height="24"/>
+        <text x="566" y="219" font-size="14" font-weight="900" fill="#111827">Muse 用仮想デスクトップ</text>
+        <text x="566" y="239" font-size="11" fill="#6B7280">TigerVNC + Chrome（CDP で操作）</text>
+
+        <!-- bot -->
+        <rect x="519" y="283" width="256" height="56" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="516" y="280" width="256" height="56" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/moomoo.png" x="528" y="295" width="26" height="26"/>
+        <text x="566" y="305" font-size="14" font-weight="900" fill="#111827">moomoo OpenD + 取引ボット</text>
+        <text x="566" y="325" font-size="11" fill="#6B7280">デモ口座の自動売買（練習運用）</text>
+
+        <!-- Tailscaleバッジ -->
+        <image href="logos/tailscale.svg" x="388" y="56" width="24" height="24"/>
+        <text x="400" y="97" font-size="11" font-weight="700" fill="#374151" text-anchor="middle">Tailscale</text>
+
+        <!-- iPhone -->
+        <rect x="325" y="115" width="156" height="66" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="322" y="112" width="156" height="66" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/apple.svg" x="334" y="132" width="24" height="24"/>
+        <text x="368" y="140" font-size="13.5" font-weight="900" fill="#111827">iPhone 15 Pro</text>
+        <text x="368" y="160" font-size="10.5" fill="#6B7280">外出先からの入口</text>
+
+        <!-- Muse VM -->
+        <rect x="325" y="247" width="156" height="66" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="322" y="244" width="156" height="66" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <text x="338" y="272" font-size="13.5" font-weight="900" fill="#111827">Muse（実行環境）</text>
+        <text x="338" y="292" font-size="10.5" fill="#6B7280">この記事の作業もここから</text>
+
+        <!-- 矢印: iPhone -> VM (RDP) -->
+        <line x1="478" y1="140" x2="512" y2="140" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arwB)"/>
+        <text x="495" y="129" font-size="10.5" font-weight="700" fill="#2563EB" text-anchor="middle">RDP</text>
+        <!-- 矢印: iPhone -> Pi (Tailscale) -->
+        <line x1="322" y1="158" x2="296" y2="200" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arwB)"/>
+        <text x="258" y="170" font-size="10.5" font-weight="700" fill="#2563EB" text-anchor="middle">Tailscale</text>
+        <!-- 矢印: Muse -> Pi (SSH) -->
+        <line x1="322" y1="268" x2="295" y2="238" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arwG)"/>
+        <text x="301" y="293" font-size="10.5" font-weight="700" fill="#9CA3AF" text-anchor="middle">SSH</text>
+        <!-- 矢印: Muse -> VM desktop (SSH) -->
+        <line x1="478" y1="272" x2="512" y2="232" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arwG)"/>
+        <text x="498" y="289" font-size="10.5" font-weight="700" fill="#9CA3AF" text-anchor="middle">SSH</text>
+
+        <!-- 配信フレーム -->
+        <rect x="16" y="402" width="768" height="142" rx="12" fill="rgba(247,247,245,.8)" stroke="#D9D9D2" stroke-width="1.8"/>
+        <text x="34" y="430" font-size="13" font-weight="900" fill="#374151">このサイトの配信</text>
+
+        <!-- GitHub -->
+        <rect x="39" y="451" width="220" height="58" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="36" y="448" width="220" height="58" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/github.svg" x="48" y="464" width="26" height="26"/>
+        <text x="86" y="474" font-size="14" font-weight="900" fill="#111827">GitHub</text>
+        <text x="86" y="493" font-size="11" fill="#6B7280">サイトのリポジトリ</text>
+
+        <!-- Pages -->
+        <rect x="293" y="451" width="220" height="58" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="290" y="448" width="220" height="58" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/cloudflare.svg" x="302" y="464" width="26" height="26"/>
+        <text x="340" y="474" font-size="14" font-weight="900" fill="#111827">Cloudflare Pages</text>
+        <text x="340" y="493" font-size="11" fill="#6B7280">tayooo.com を配信</text>
+
+        <!-- Search Console -->
+        <rect x="547" y="451" width="220" height="58" rx="10" fill="rgba(15,23,42,.08)"/>
+        <rect x="544" y="448" width="220" height="58" rx="10" fill="#fff" stroke="#D4D4D8" stroke-width="1.6"/>
+        <image href="logos/googlesearchconsole.svg" x="556" y="464" width="26" height="26"/>
+        <text x="594" y="474" font-size="14" font-weight="900" fill="#111827">Search Console</text>
+        <text x="594" y="493" font-size="11" fill="#6B7280">Web Analytics と併用</text>
+
+        <!-- 矢印: GitHub -> Pages -->
+        <line x1="256" y1="477" x2="286" y2="477" stroke="#9CA3AF" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arwG)"/>
+        <text x="400" y="530" font-size="10.5" fill="#9CA3AF" text-anchor="middle">コミットすると自動でデプロイされる</text>
+      </svg>
+    </div>
+    <p class="cap">※ セキュリティのため、グローバルIPやアドレスの詳細は載せていない。接続先のポートはインターネットに一切公開していない。</p>
+
+    <h2>機器と役割</h2>
+    <table>
+      <tr><th>名前</th><th>場所</th><th>役割</th></tr>
+      <tr><td>TP-Link Archer AX1500</td><td>自宅</td><td>ルーター。家庭内LANの入口</td></tr>
+      <tr><td>Raspberry Pi（Debian 13）</td><td>自宅</td><td>Zabbix で全ホストを監視。Tailscale のサブネットルーターと出口ノードも兼任</td></tr>
+      <tr><td>Windows デスクトップ</td><td>自宅</td><td>メイン機</td></tr>
+      <tr><td>OCI VM（Ubuntu 24.04／arm64）</td><td>Oracle Cloud</td><td>Xfce + XRDP の軽量デスクトップ。作業用＆ボットの運用基盤で、Muse 用の仮想デスクトップもこの中</td></tr>
+      <tr><td>iPhone 15 Pro</td><td>手元</td><td>Tailscale と Windows App で、外出先から自宅と VM の両方に入る</td></tr>
+      <tr><td>Muse（AIアシスタント）</td><td>クラウドの VM</td><td>このサイトの更新や監視の実行環境。各ホストへの SSH は専用ユーザー・鍵認証のみ・sudo なし</td></tr>
+      <tr><td>tayooo.com</td><td>Cloudflare Pages</td><td>このサイト。GitHub にコミットすると自動デプロイ</td></tr>
+    </table>
+
+    <h2>つなぎ方</h2>
+    <p>接続は原則すべて Tailscale 経由に寄せている。OCI VM のリモートデスクトップ（XRDP）も 3389 番をインターネットに公開せず、Tailscale の内側からだけ届くようにした。自宅側は Raspberry Pi が LAN（192.168.0.0/24）のサブネットルートを広告しているので、外出先の iPhone からも自宅の機器に「同じ LAN にいる」感覚で届く。</p>
+    <p>AIアシスタント（Muse）にも作業させるため、Pi と VM には専用ユーザーを作って鍵認証だけを許可している。sudo は付けていない。設定変更が要る作業は「スクリプトを用意してもらって、自分が1行だけ実行する」分担にしていて、これは思いのほか安全で速い。</p>
+
+    <h2>AIに触らせるデスクトップ</h2>
+    <p>OCI VM の中には、自分用とは別に、Muse 専用の仮想デスクトップも用意してある。TigerVNC で 1280×800 の Xfce 画面を作り、Chrome はリモートデバッグ（CDP）を有効にしてある。Muse はこの Chrome を CDP 経由で操作するので、画面のスクリーンショットを見ながらではなく、ページの構造（DOM）を直接読んで、クリックや入力、フォーム送信まで実行できる。デスクトップ自体も Tailscale の内側からしか届かない場所に置いてある。</p>
+    <p>どんな時に使うかというと、普段の作業は Muse 側のブラウザで足りていて、このデスクトップの出番は限られる。具体的には次のような「切り札」用途だ。</p>
+    <ul>
+      <li>懸賞応募などで、通常の自動ブラウザがボット判定で弾かれた案件の再挑戦</li>
+      <li>日本の IP でないと開けない・応募できないサイトでの作業</li>
+      <li>ログイン状態を保持したまま、同じブラウザで繰り返し作業したいとき</li>
+    </ul>
+    <p>メリットは3つ。まず、国内 IP ＋ 実ブラウザなので、クラウド側の自動ブラウザより弾かれにくい。次に、CDP で構造を直接操作できるため、スクリーンショット駆動の操作より速く、AI 側のトークン消費も大幅に少ない（これは実際に比較して確認した）。最後に、ブラウザのプロファイルが残るので、ログイン状態や作業の続きを保持できる。</p>
+    <p>デメリットもある。用意と維持にひと手間かかる（VNC の起動・停止は手動、ログインが切れたら GUI で再ログインが要る）。何でもできるわけではなく、画像認証のような「見て解く」操作は苦手で、最後は人間の出番になる。あと VM が arm64 なので、x86 向けのソフトは QEMU 経由のような工夫が要る（moomoo の OpenD がまさにその例）。</p>
+    <p>効率の実感としては、「普段は眠っている保険」という位置づけが正直なところだ。出番自体は少ない。ただ、弾かれて終わりだった案件を拾えるかどうかは大きくて、その一点で置いておく価値があると思っている。</p>
+
+    <h2>監視</h2>
+    <p>監視は Pi 上の Zabbix に集約。対象は Pi 本体、ルーター、デスクトップ、OCI VM、このサイトの5つ。ついでに天気・防災のダッシュボード（地震情報や警報）と、Muse の使用率グラフも同じ画面に置いている。通知は異常のときだけ来る設定で、正常な日は何も届かない。静かなのが正解、という運用である。</p>
+
+    <h2>締め</h2>
+    <p>物理サーバーはラズパイ1台に集約できたので、電気代も場所も取らない。デスクトップ環境が要る作業は OCI の VM、監視と出入口は Pi、サイトは Cloudflare。境界線を引いて、あとは Tailscale でつなぐ——今のところ、この形が一番落ち着いている。</p>
+  </article>
+  <div class="toindex"><a href="/blog/">記事一覧へ</a></div>
+  <footer><a href="/">© 2026 TAYOOO</a></footer>
+</div>
+<script src="/season.js" defer></script>
+</body>
+</html>
